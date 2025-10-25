@@ -1,36 +1,152 @@
 // --- ESTADO DE LA APLICACIÓN ---
-// Empezamos con los valores que se ven en el HTML
-let totalAhorrado = 1000.00;
-let totalPuntos = 100; // 100 puntos por los $1000 iniciales (1000 * 0.1)
-const metaAhorro = 5000.00;
-
-// --- REGLA DE NEGOCIO ---
-// 1 punto por cada $10 MXN
-const PUNTOS_POR_PESO = 0.1; 
+let totalAhorrado = 1000.0;
+let totalPuntos = 100;
+const metaAhorro = 5000.0;
+const PUNTOS_POR_PESO = 0.1;
 
 // --- SELECCIÓN DE ELEMENTOS DEL DOM ---
+// Mantener como potencialmente nulos y comprobar antes de usar
+const openModalBtn = document.querySelector('.btn-depositar') as HTMLButtonElement | null;
+const depositModal = document.getElementById('deposit-modal') as HTMLDivElement | null;
+const closeModalBtn = document.getElementById('close-modal-btn') as HTMLButtonElement | null;
+const confirmDepositBtn = document.getElementById('confirm-deposit-btn') as HTMLButtonElement | null;
+const depositInput = document.getElementById('deposit-amount-input') as HTMLInputElement | null;
+const totalAhorradoDisplay = document.getElementById('total-ahorrado-display') as HTMLHeadingElement | null;
+const metaDisplay = document.getElementById('meta-display') as HTMLParagraphElement | null;
+const progressBarFill = document.getElementById('progress-bar-fill') as HTMLDivElement | null;
+const totalPuntosDisplay = document.getElementById('total-puntos-display') as HTMLParagraphElement | null;
+const plantContainer = document.getElementById('plant-container') as HTMLDivElement | null;
 
-// Botones del Modal
-const openModalBtn = document.querySelector('.btn-depositar') as HTMLButtonElement;
-const depositModal = document.getElementById('deposit-modal') as HTMLDivElement;
-const closeModalBtn = document.getElementById('close-modal-btn') as HTMLButtonElement;
-const confirmDepositBtn = document.getElementById('confirm-deposit-btn') as HTMLButtonElement;
-const depositInput = document.getElementById('deposit-amount-input') as HTMLInputElement;
+// +++ AÑADIDO: Selector del contenedor de misiones +++
+const missionListContainer = document.getElementById('mission-list-container') as HTMLDivElement | null;
 
-// Elementos de la UI para actualizar
-const totalAhorradoDisplay = document.getElementById('total-ahorrado-display') as HTMLHeadingElement;
-const metaDisplay = document.getElementById('meta-display') as HTMLParagraphElement;
-const progressBarFill = document.getElementById('progress-bar-fill') as HTMLDivElement;
-const totalPuntosDisplay = document.getElementById('total-puntos-display') as HTMLParagraphElement;
+// --- +++ SISTEMA DE MISIONES +++ ---
 
+interface Mission {
+    id: string;
+    title: string;
+    type: 'DEPOSIT_ONCE' | 'SET_GOAL' | 'READ_TIP';
+    params: { minAmount?: number };
+    rewards: { points: number; water?: number; sun?: number };
+    iconColor: string;
+}
 
-// --- FUNCIONES ---
+const missionDatabase: Mission[] = [
+    {
+        id: 'deposit_10',
+        title: 'Deposita $10 pesos',
+        type: 'DEPOSIT_ONCE',
+        params: { minAmount: 10 },
+        rewards: { points: 2, water: 2 },
+        iconColor: 'bg-green'
+    },
+    {
+        id: 'deposit_50',
+        title: '¡Buen inicio! Deposita $50',
+        type: 'DEPOSIT_ONCE',
+        params: { minAmount: 50 },
+        rewards: { points: 10, water: 5 },
+        iconColor: 'bg-pink'
+    },
+    {
+        id: 'Lee esto',
+        title: 'Lee esto',
+        type: 'READ_TIP',
+        params: {},
+        rewards: { points: 5 },
+        iconColor: 'bg-blue'
+    }
+];
 
-/**
- * Formatea un número como moneda MXN.
- * @param amount - La cantidad numérica.
- * @returns La cantidad formateada como string (ej. $1,234.50).
- */
+let activeDailyMissions: Mission[] = [];
+let completedDailyMissionIds: string[] = [];
+
+function loadDailyMissions() {
+    activeDailyMissions = missionDatabase.slice(0, 3);
+    completedDailyMissionIds = [];
+    console.log('Misiones diarias cargadas:', activeDailyMissions);
+}
+
+function renderMissions() {
+    if (!missionListContainer) return;
+
+    missionListContainer.innerHTML = '';
+
+    if (activeDailyMissions.length === 0) {
+        missionListContainer.innerHTML = '<p class="text-gray-500 text-sm">No hay misiones por hoy, ¡vuelve mañana!</p>';
+        return;
+    }
+
+    activeDailyMissions.forEach(mission => {
+        const isCompleted = completedDailyMissionIds.includes(mission.id);
+
+        const missionCard = document.createElement('div');
+        missionCard.className = `mission-card ${isCompleted ? 'opacity-50' : ''}`;
+
+        const iconBg = document.createElement('div');
+        iconBg.className = `mission-icon-bg ${mission.iconColor} flex items-center justify-center text-2xl`;
+        iconBg.innerHTML = isCompleted ? '✅' : '🎯';
+
+        const details = document.createElement('div');
+        details.className = 'mission-details';
+        details.innerHTML = `
+            <p class="mission-title">${mission.title}</p>
+            <p class="mission-rewards">
+                <span>🪙 ${mission.rewards.points}</span>
+                ${mission.rewards.water ? `<span>💧 ${mission.rewards.water}</span>` : ''}
+                ${mission.rewards.sun ? `<span>☀️ ${mission.rewards.sun}</span>` : ''}
+            </p>
+        `;
+
+        const arrow = document.createElement('span');
+        arrow.className = 'mission-arrow';
+        arrow.textContent = isCompleted ? '✔️' : '>';
+
+        missionCard.appendChild(iconBg);
+        missionCard.appendChild(details);
+        missionCard.appendChild(arrow);
+
+        missionListContainer.appendChild(missionCard);
+    });
+}
+
+function checkMissionProgress(actionType: string, actionParams: any) {
+    console.log(`Revisando misiones tipo: ${actionType}`, actionParams);
+
+    const relevantMissions = activeDailyMissions.filter(
+        mission =>
+            mission.type === actionType &&
+            !completedDailyMissionIds.includes(mission.id)
+    );
+
+    for (const mission of relevantMissions) {
+        let conditionsMet = false;
+
+        if (mission.type === 'DEPOSIT_ONCE') {
+            if (actionParams.amount >= (mission.params.minAmount ?? 0)) {
+                conditionsMet = true;
+            }
+        }
+
+        if (conditionsMet) {
+            completeMission(mission);
+        }
+    }
+}
+
+function completeMission(mission: Mission) {
+    console.log(`¡Misión completada: ${mission.title}!`);
+    if (completedDailyMissionIds.includes(mission.id)) return;
+
+    completedDailyMissionIds.push(mission.id);
+    totalPuntos += mission.rewards.points;
+    console.log(`+${mission.rewards.points} puntos. Total ahora: ${totalPuntos}`);
+
+    actualizarUI();
+}
+
+// --- FUNCIONES DE LÓGICA DE DEPÓSITO ---
+
 function formatCurrency(amount: number): string {
     return amount.toLocaleString('es-MX', {
         style: 'currency',
@@ -38,95 +154,151 @@ function formatCurrency(amount: number): string {
     });
 }
 
-/**
- * Actualiza todos los elementos de la UI con los valores del estado actual.
- */
 function actualizarUI() {
-    // 1. Actualizar el ahorro
-    totalAhorradoDisplay.textContent = `Has ahorrado ${formatCurrency(totalAhorrado)}`;
-    
-    // 2. Actualizar la meta
-    const restante = metaAhorro - totalAhorrado;
-    if (restante > 0) {
-        metaDisplay.textContent = `Meta ${formatCurrency(metaAhorro)} - Faltan ${formatCurrency(restante)}`;
-    } else {
-        metaDisplay.textContent = `¡Meta de ${formatCurrency(metaAhorro)} alcanzada!`;
+    if (totalAhorradoDisplay) {
+        totalAhorradoDisplay.textContent = `Has ahorrado ${formatCurrency(totalAhorrado)}`;
     }
 
-    // 3. Actualizar la barra de progreso
-    const progreso = Math.min((totalAhorrado / metaAhorro) * 100, 100);
-    progressBarFill.style.width = `${progreso}%`;
+    const restante = metaAhorro - totalAhorrado;
+    if (metaDisplay) {
+        metaDisplay.textContent = restante > 0
+            ? `Meta ${formatCurrency(metaAhorro)} - Faltan ${formatCurrency(restante)}`
+            : `¡Meta de ${formatCurrency(metaAhorro)} alcanzada!`;
+    }
 
-    // 4. Actualizar los puntos
-    // Usamos Math.floor para mostrar puntos enteros
-    totalPuntosDisplay.textContent = Math.floor(totalPuntos).toString();
+    if (progressBarFill) {
+        const progreso = Math.min((totalAhorrado / metaAhorro) * 100, 100);
+        progressBarFill.style.width = `${progreso}%`;
+    }
+
+    if (totalPuntosDisplay) {
+        totalPuntosDisplay.textContent = Math.floor(totalPuntos).toString();
+    }
+
+    renderMissions();
 }
 
-/**
- * Maneja la lógica de confirmar un depósito.
- */
 function handleDeposit() {
-    // 1. Obtener y validar el monto
-    const montoDepositado = parseFloat(depositInput.value);
-    
-    if (isNaN(montoDepositado) || montoDepositado <= 0) {
-        // Opcional: mostrar un error al usuario
-        console.error("Monto inválido");
-        depositInput.value = ""; // Limpiar input
+    if (!depositInput) {
+        console.error('Campo de depósito no encontrado');
         return;
     }
 
-    // 2. Calcular puntos ganados
-    const puntosGanados = montoDepositado * PUNTOS_POR_PESO;
+    const montoDepositado = parseFloat(depositInput.value);
+    if (isNaN(montoDepositado) || montoDepositado <= 0) {
+        console.error('Monto inválido');
+        depositInput.value = '';
+        return;
+    }
 
-    // 3. Actualizar el estado global
+    const puntosGanados = montoDepositado * PUNTOS_POR_PESO;
     totalAhorrado += montoDepositado;
     totalPuntos += puntosGanados;
 
-    console.log(`Depositado: ${formatCurrency(montoDepositado)}`);
-    console.log(`Puntos Ganados: ${puntosGanados}`);
-    console.log(`Total Ahorrado: ${formatCurrency(totalAhorrado)}`);
-    console.log(`Total Puntos: ${totalPuntos}`);
+    checkMissionProgress('DEPOSIT_ONCE', { amount: montoDepositado });
 
-    // 4. Actualizar la UI
     actualizarUI();
-
-    // 5. Limpiar y cerrar el modal
-    depositInput.value = "";
+    depositInput.value = '';
     closeDepositModal();
 }
 
-// Funciones para abrir/cerrar modal (tu código original)
 function openDepositModal() {
+    if (!depositModal || !depositInput) return;
     depositModal.classList.remove('hidden');
-    // Opcional: Poner el foco (cursor) en el input automáticamente
-    const depositInput = document.getElementById('deposit-amount-input') as HTMLInputElement;
     depositInput.focus();
 }
 
-// 3. Función para CERRAR el modal
 function closeDepositModal() {
+    if (!depositModal) return;
     depositModal.classList.add('hidden');
 }
 
-// 4. Asignar los "escuchadores" de eventos
-openModalBtn.addEventListener('click', openDepositModal);
-closeModalBtn.addEventListener('click', closeDepositModal);
+// --- ASIGNACIÓN DE EVENTOS DE DEPÓSITO ---
+if (openModalBtn) openModalBtn.addEventListener('click', openDepositModal);
+if (closeModalBtn) closeModalBtn.addEventListener('click', closeDepositModal);
+if (confirmDepositBtn) confirmDepositBtn.addEventListener('click', handleDeposit);
+if (depositModal) {
+    depositModal.addEventListener('click', (event) => {
+        if (event.target === depositModal) {
+            closeDepositModal();
+        }
+    });
+}
 
-// 5. (Opcional) Cerrar el modal si se hace clic en el fondo oscuro
-depositModal.addEventListener('click', (event) => {
-    // Si el elemento en el que hicimos clic es el overlay (el fondo)...
-    if (event.target === depositModal) {
-        closeDepositModal();
+// --- INICIALIZACIÓN DE UI ---
+document.addEventListener('DOMContentLoaded', () => {
+    loadDailyMissions();
+    actualizarUI();
+    if (plantContainer) {
+        init3DPlant();
     }
 });
 
-// ¡NUEVO! Evento para el botón de confirmar
-confirmDepositBtn.addEventListener('click', handleDeposit);
+// --- LÓGICA DEL VISOR 3D (Three.js) ---
+/* Mantengo tus @ts-ignore para dependencias cargadas vía <script> en HTML */
+// @ts-ignore
+const THREE = (window as any).THREE;
+// @ts-ignore
+const GLTFLoader = (window as any).GLTFLoader;
+// @ts-ignore
+const OrbitControls = (window as any).OrbitControls;
 
-// --- INICIALIZACIÓN ---
-// Asegurarse de que la UI muestre los valores iniciales correctos al cargar la página
-// Usamos DOMContentLoaded para asegurar que todos los elementos estén listos
-document.addEventListener('DOMContentLoaded', () => {
-    actualizarUI();
-});
+let scene: any, camera: any, renderer: any, controls: any, plantModel: any;
+
+function init3DPlant() {
+    if (!plantContainer || !THREE || !OrbitControls) return;
+
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(
+        50,
+        Math.max(1, plantContainer.clientWidth) / Math.max(1, plantContainer.clientHeight),
+        0.1,
+        1000
+    );
+    camera.position.z = 3;
+    camera.position.y = 0.5;
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setSize(plantContainer.clientWidth, plantContainer.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    plantContainer.appendChild(renderer.domElement);
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.enableZoom = false;
+    controls.enablePan = false;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 2.0;
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(2, 5, 3);
+    scene.add(directionalLight);
+
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: 0x22c55e });
+    plantModel = new THREE.Mesh(geometry, material);
+    scene.add(plantModel);
+
+    animate3D();
+    window.addEventListener('resize', onWindowResize);
+}
+
+function animate3D() {
+    requestAnimationFrame(animate3D);
+    if (controls) controls.update();
+    if (renderer && scene && camera) renderer.render(scene, camera);
+}
+
+function onWindowResize() {
+    if (!plantContainer || !camera || !renderer) return;
+    const width = plantContainer.clientWidth;
+    const height = plantContainer.clientHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+}
