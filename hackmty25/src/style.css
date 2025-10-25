@@ -301,7 +301,9 @@ body {
     font-size: 1.2rem;
     text-align: center;
     /* Evita que aparezcan las flechas en el input (opcional) */
+    -webkit-appearance: textfield;
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .modal-content input[type="number"]::-webkit-outer-spin-button,
