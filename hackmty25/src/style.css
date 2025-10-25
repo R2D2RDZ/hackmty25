@@ -54,12 +54,13 @@ body {
     grid-template-columns: 3fr 1fr; /* Columnas para info y rendimiento */
     align-items: start;
     row-gap: 0.5rem;
+    border: 1px solid #d1d5db;
 }
 
 .savings-info h2 {
     margin: 0;
     font-size: 1.25rem;
-    color: #111827;
+    color: #4B465C;
 }
 
 .savings-info .meta {
@@ -129,6 +130,7 @@ body {
     padding: 1rem 0.5rem;
     text-align: center;
     font-size: 0.9rem;
+    border: 1px solid #d1d5db;
 }
 
 .stat-icon {
@@ -155,29 +157,34 @@ body {
 
 /* --- 2.4. Sección de Misiones --- */
 .missions-section {
-    margin-top: 2.5rem;
+    margin-top: 1.69rem;
 }
 
 .missions-section h3 {
-    margin: 0 0 1rem 0;
+    margin: 0 0 0.5rem 0;
     font-size: 1.1rem;
-    color: #111827;
+    color: #4B465C;
 }
 
 .mission-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #d1d5db;
 }
 
 .mission-card {
     display: flex;
     align-items: center;
-    background-color: #ffffff;
     padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     cursor: pointer;
+    border-bottom: 1px solid #DBDADE;
+}
+
+.mission-card3{
+    border-bottom: 0px solid #DBDADE;
 }
 
 .mission-icon-bg {
@@ -199,7 +206,7 @@ body {
 .mission-details .mission-title {
     margin: 0;
     font-weight: 600;
-    color: #111827;
+    color: #4B465C;
 }
 
 .mission-details .mission-rewards {
@@ -214,7 +221,7 @@ body {
 
 .mission-arrow {
     font-size: 1.5rem;
-    color: #9ca3af;
+    color: #e63946;
     font-weight: bold;
 }
 
