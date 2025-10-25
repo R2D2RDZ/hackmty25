@@ -1,24 +1,29 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+// 1. Seleccionar los elementos del DOM
+const openModalBtn = document.querySelector('.btn-depositar') as HTMLButtonElement;
+const depositModal = document.getElementById('deposit-modal') as HTMLDivElement;
+const closeModalBtn = document.getElementById('close-modal-btn') as HTMLButtonElement;
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+// 2. Función para ABRIR el modal
+function openDepositModal() {
+    depositModal.classList.remove('hidden');
+    // Opcional: Poner el foco (cursor) en el input automáticamente
+    const depositInput = document.getElementById('deposit-amount-input') as HTMLInputElement;
+    depositInput.focus();
+}
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+// 3. Función para CERRAR el modal
+function closeDepositModal() {
+    depositModal.classList.add('hidden');
+}
+
+// 4. Asignar los "escuchadores" de eventos
+openModalBtn.addEventListener('click', openDepositModal);
+closeModalBtn.addEventListener('click', closeDepositModal);
+
+// 5. (Opcional) Cerrar el modal si se hace clic en el fondo oscuro
+depositModal.addEventListener('click', (event) => {
+    // Si el elemento en el que hicimos clic es el overlay (el fondo)...
+    if (event.target === depositModal) {
+        closeDepositModal();
+    }
+});

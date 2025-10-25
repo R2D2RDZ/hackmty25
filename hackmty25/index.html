@@ -109,7 +109,17 @@
             <button class="btn-depositar">Depositar</button>
         </footer>
 
+        <div id="deposit-modal" class="modal-overlay hidden"> <div class="modal-content">
+                <h3>¿Cuánto quieres depositar?</h3>
+                <input type="number" id="deposit-amount-input" placeholder="0.00" min="0">
+                
+                <button id="confirm-deposit-btn" class="btn-primary">Confirmar</button>
+                <button id="close-modal-btn" class="btn-secondary">Cancelar</button>
+            </div>
+        </div>
+
     </div>
-    
+    <script src="src/main.ts"></script>
 </body>
+
 </html>
