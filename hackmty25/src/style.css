@@ -6,9 +6,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100vh;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+
 }
 
 * {
@@ -18,9 +16,8 @@ body {
 /* --- Contenedor de la App --- */
 .app-container {
     width: 100%;
-    max-width: 400px; /* Ancho típico de un teléfono */
+    max-width: 100%; /* Ancho típico de un teléfono */
     background-color: #f9fafb; /* Fondo principal de la app (gris muy claro) */
-    border-radius: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     overflow: hidden; /* Oculta lo que se salga */
     position: relative; /* Clave para el footer fijo */
