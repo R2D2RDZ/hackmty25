@@ -1,96 +1,248 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
+/* --- Configuración General --- */
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #e5e7eb; /* Fondo gris para la página */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+* {
+    box-sizing: border-box;
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* --- Contenedor de la App --- */
+.app-container {
+    width: 100%;
+    max-width: 400px; /* Ancho típico de un teléfono */
+    background-color: #f9fafb; /* Fondo principal de la app (gris muy claro) */
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Oculta lo que se salga */
+    position: relative; /* Clave para el footer fijo */
+    padding-bottom: 90px; /* Deja espacio para el footer */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vanilla:hover {
-  filter: drop-shadow(0 0 2em #3178c6aa);
+/* --- 1. Cabecera Roja --- */
+.app-header {
+    background-color: #e63946; /* Rojo principal */
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
 }
 
-.card {
-  padding: 2em;
+.back-arrow {
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-.read-the-docs {
-  color: #888;
+/* --- 2. Contenido Principal --- */
+.content-area {
+    padding: 1.5rem;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
+/* --- 2.1. Tarjeta de Ahorro --- */
+.savings-card {
     background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: grid;
+    grid-template-columns: 3fr 1fr; /* Columnas para info y rendimiento */
+    align-items: start;
+    row-gap: 0.5rem;
+}
+
+.savings-info h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #111827;
+}
+
+.savings-info .meta {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.savings-yield {
+    text-align: right;
+}
+
+.badge-rendimiento {
+    background-color: #dcfce7; /* Verde claro */
+    color: #166534; /* Verde oscuro */
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    display: inline-block;
+}
+
+.savings-yield .anual {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.progress-bar {
+    grid-column: 1 / -1; /* Ocupa ambas columnas */
+    width: 100%;
+    background-color: #e5e7eb; /* Gris de fondo de la barra */
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #e63946; /* Rojo de progreso */
+    border-radius: 4px;
+}
+
+/* --- 2.2. Sección de la Planta --- */
+.plant-section {
+    text-align: center;
+    padding: 2.5rem 0; /* Espaciado vertical */
+}
+
+.plant-image {
+    font-size: 7rem; /* Tamaño del emoji */
+    line-height: 1;
+}
+
+/* --- 2.3. Grid de Estadísticas --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales */
+    gap: 0.75rem;
+}
+
+.stat-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 1rem 0.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.stat-card p {
+    margin: 0.25rem 0;
+    color: #374151;
+    font-weight: 500;
+}
+
+.stat-card .stat-value {
+    color: #6b7280;
+    font-weight: normal;
+}
+
+.stat-card .stat-value.red {
+    color: #e63946;
+    font-weight: 600;
+}
+
+/* --- 2.4. Sección de Misiones --- */
+.missions-section {
+    margin-top: 2.5rem;
+}
+
+.missions-section h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    color: #111827;
+}
+
+.mission-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.mission-card {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.mission-icon-bg {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 1rem;
+    flex-shrink: 0; /* Evita que se encoja */
+}
+/* Colores de los iconos de misión */
+.bg-green { background-color: #34d399; }
+.bg-pink { background-color: #f472b6; }
+.bg-orange { background-color: #fb923c; }
+
+.mission-details {
+    flex-grow: 1; /* Empuja la flecha a la derecha */
+}
+
+.mission-details .mission-title {
+    margin: 0;
+    font-weight: 600;
+    color: #111827;
+}
+
+.mission-details .mission-rewards {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.mission-details .mission-rewards span {
+    margin-right: 0.5rem;
+}
+
+.mission-arrow {
+    font-size: 1.5rem;
+    color: #9ca3af;
+    font-weight: bold;
+}
+
+/* --- 3. Footer Fijo --- */
+.app-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    /* Aseguramos que esté sobre el contenido si hay scroll */
+    z-index: 10;
+}
+
+.btn-depositar {
+    width: 100%;
+    background-color: #e63946;
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 9999px; /* Totalmente redondeado */
+    cursor: pointer;
 }

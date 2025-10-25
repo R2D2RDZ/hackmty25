@@ -1,13 +1,115 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hackmty25</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Ahorro</title>
+    <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <header class="app-header">
+            <span class="back-arrow">&lt;</span>
+        </header>
+
+        <main class="content-area">
+
+            <section class="savings-card">
+                <div class="savings-info">
+                    <h2>Has ahorrado $1,000</h2>
+                    <p class="meta">Meta $5000 - Faltan $4,000</p>
+                </div>
+                <div class="savings-yield">
+                    <span class="badge-rendimiento">Rendimiento</span>
+                    <p class="anual">7.5 Anual</p>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 20%;"></div>
+                </div>
+            </section>
+
+            <section class="plant-section">
+                <div class="plant-image">🪴</div>
+            </section>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-icon">🔥</span>
+                    <p>Racha</p>
+                    <p class="stat-value red">5 Días</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">💧</span>
+                    <p>Agua</p>
+                    <p class="stat-value">10/20</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">☀️</span>
+                    <p>Sol</p>
+                    <p class="stat-value">5/10</p>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🌼</span>
+                    <p>Fertilizante</p>
+                    <p class="stat-value">5/10</p>
+                </div>
+            </section>
+
+            <section class="missions-section">
+                <h3>Misiones de hoy</h3>
+                <div class="mission-list">
+                    
+                    <div class="mission-card">
+                        <div class="mission-icon-bg bg-green"></div>
+                        <div class="mission-details">
+                            <p class="mission-title">Deposita 10 pesos</p>
+                            <p class="mission-rewards">
+                                <span>🪙 2</span>
+                                <span>💧 2</span>
+                                <span>🌼 2</span>
+                            </p>
+                        </div>
+                        <span class="mission-arrow">&gt;</span>
+                    </div>
+
+                    <div class="mission-card">
+                        <div class="mission-icon-bg bg-pink"></div>
+                        <div class="mission-details">
+                            <p class="mission-title">[Necesidad]</p>
+                            <p class="mission-rewards">
+                                <span>🪙 2</span>
+                                <span>💧 2</span>
+                                <span>🌼 2</span>
+                            </p>
+                        </div>
+                        <span class="mission-arrow">&gt;</span>
+                    </div>
+
+                    <div class="mission-card">
+                        <div class="mission-icon-bg bg-orange"></div>
+                        <div class="mission-details">
+                            <p class="mission-title">[Necesidad]</p>
+                            <p class="mission-rewards">
+                                <span>🪙 2</span>
+                                <span>💧 2</span>
+                                <span>🌼 2</span>
+                            </p>
+                        </div>
+                        <span class="mission-arrow">&gt;</span>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="app-footer">
+            <button class="btn-depositar">Depositar</button>
+        </footer>
+
+    </div>
+    
+</body>
 </html>
