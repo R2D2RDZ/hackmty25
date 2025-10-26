@@ -44,7 +44,13 @@ const closeSuccessBtn = document.getElementById('close-success-btn') as HTMLButt
 // Misiones
 const missionListContainer = document.getElementById('mission-list-container') as HTMLDivElement | null;
 
-
+interface RangoData {
+    rango: number;
+    nombre: string;
+    meta: number;
+    recompensaPts: number;
+    recompensaCashback?: number; // <-- El signo '?' lo hace opcional
+}
 // --- SISTEMA DE MISIONES ---
 interface Mission {
     id: string; title: string; type: 'DEPOSIT_ONCE' | 'SET_GOAL' | 'READ_TIP';
@@ -200,24 +206,67 @@ function completeMission(mission: Mission) {
  * Revisa si el ahorro total cumple la meta para subir de rango.
  */
 function checkRangoUpgrade() {
-    // Solo aplica para el salto de Rango 1 a Rango 2 (Semilla a Árbol)
-    if (currentRango === 1 && totalAhorrado >= siguienteMetaRango) {
-        
-        // Simular subir a Rango 2 (Árbol)
-        currentRango = 2;
-        
-        // 1. Bonificación por Rango
-        totalPuntos += PUNTOS_BONO_RANGO_2;
-        console.log(`¡RANGO UPGRADE! Árbol desbloqueado. Bono de +${PUNTOS_BONO_RANGO_2} puntos.`);
+    if (currentRango >= 5) return; // Ya está en el rango máximo
 
-        // 2. Nueva Meta para el siguiente rango
-        // Reiniciamos el progreso visual y establecemos una meta mayor
-        totalAhorrado = 0.00; 
-        siguienteMetaRango = 5000.00; // Siguiente meta de $5,000
+    let proximoRangoIndex = currentRango + 1;
+    let proximoRangoData = RANGOS_DATA[proximoRangoIndex];
 
-        // 3. Recargar misiones (en caso de que hayan nuevos tipos para el Rango 2)
-        loadDailyMissions();
-        actualizarUI();
+    // --- LÓGICA DE CONDICIÓN DE RANGO ---
+    let rankUpConditionMet = false;
+
+    // --- CAMBIO CLAVE: Lógica especial para Rango 1 -> 2 ---
+    if (currentRango === 1 && proximoRangoIndex === 2) {
+        const metaRango2Fija = proximoRangoData.meta; // $1,000
+        const metaPersonalUsuario = metaAhorro; // La que guardamos en onboarding
+        
+        // Tu nueva regla: Debe cumplir AMBAS condiciones
+        if (totalAhorrado >= metaRango2Fija && totalAhorrado >= metaPersonalUsuario) {
+            rankUpConditionMet = true;
+        }
+    }
+    // Lógica normal para Rango 0->1 (onboarding) y Rango 2+
+    else {
+        if (totalAhorrado >= proximoRangoData.meta) {
+            rankUpConditionMet = true;
+        }
+    }
+    // --- FIN CAMBIO ---
+
+
+    // Loop por si un depósito grande sube múltiples rangos a la vez
+    // (Ej. Rango 2 -> 3 -> 4)
+    while (currentRango < 5 && rankUpConditionMet) {
+        
+        // --- SUBIÓ DE RANGO ---
+        currentRango = proximoRangoData.rango;
+        
+        // 1. Dar recompensas de Puntos
+        if (proximoRangoData.recompensaPts > 0) {
+            totalPuntos += proximoRangoData.recompensaPts;
+            console.log(`¡RANGO UPGRADE! Rango ${currentRango} (${proximoRangoData.nombre}) desbloqueado. Bono de +${proximoRangoData.recompensaPts} puntos.`);
+        }
+        
+        // 2. Dar recompensa de Cashback (si la hay)
+        if (proximoRangoData.recompensaCashback) {
+            console.log(`¡FELICIDADES! Rango ${currentRango} alcanzado. ¡Recibes $${proximoRangoData.recompensaCashback} de Cashback!`);
+        }
+
+        // 3. Actualizar la variable 'siguienteMetaRango' para la UI
+        if (currentRango < 5) {
+            siguienteMetaRango = RANGOS_DATA[currentRango + 1].meta;
+        } else {
+            siguienteMetaRango = proximoRangoData.meta;
+        }
+
+        // 4. Preparar el loop para checar el *siguiente* rango (por si lo alcanzó también)
+        proximoRangoIndex = currentRango + 1;
+        if (proximoRangoIndex <= 5) {
+            proximoRangoData = RANGOS_DATA[proximoRangoIndex];
+            // La condición para el siguiente loop siempre será la normal
+            rankUpConditionMet = (totalAhorrado >= proximoRangoData.meta);
+        } else {
+            rankUpConditionMet = false; // Detiene el loop (Rango Máx)
+        }
     }
 }
 
@@ -270,8 +319,8 @@ function updatePlantImage(progress: number) {
     // Si es < 20, se queda en imageIndex = 0
 
     // Cambia la fuente de la imagen
-    plantImage.src = `assets/rango/plant-${imageIndex}.png`;
-    plantImage.alt = `Planta en rango ${imageIndex}`;
+    plantImage.src = `src/Assets/fase_${imageIndex+1}.png`;
+    plantImage.alt = `Planta en rango ${imageIndex+1}`;
 }
 
 
@@ -416,30 +465,34 @@ function handleConfirmGoal() {
     const montoMeta = parseFloat(goalAmountInput.value);
     const frecuencia = goalFrequencySelect.value;
 
-    // Validation with better feedback
     if (isNaN(montoMeta) || montoMeta < 100) {
-        // Shake animation on error
+        // (Lógica de error... se mantiene igual)
         goalAmountInput.classList.add('shake-animation');
         setTimeout(() => goalAmountInput.classList.remove('shake-animation'), 500);
-        
-        // Error message with style
         const errorMsg = document.createElement('div');
         errorMsg.className = 'error-message';
         errorMsg.textContent = "Por favor, introduce una meta válida (mínimo $100 MXN).";
         goalAmountInput.parentElement?.appendChild(errorMsg);
-        
-        // Remove error after 3 seconds
         setTimeout(() => errorMsg.remove(), 3000);
         return;
     }
 
     // Success flow
-    metaAhorro = montoMeta;
+    metaAhorro = montoMeta; // Guardamos la meta personal (Ej: $5,000)
     metaFrecuencia = frecuencia;
-    currentRango = 1;
-    siguienteMetaRango = 1000.00;
+    
+    // --- CAMBIO CLAVE (LÓGICA RANGO 1 -> 2) ---
+    currentRango = 1; // Pasa a Rango 1 (Semilla)
+    
+    // Obtenemos la meta fija del Rango 2 ($1,000)
+    const metaRango2 = RANGOS_DATA.find(r => r.rango === 2)!.meta; // 1000.00
+    
+    // Tu nueva regla: La meta visible (UI) es el MÁXIMO entre la meta Rango 2 y la meta Personal.
+    siguienteMetaRango = Math.max(metaRango2, metaAhorro);
+    // (Si la meta personal es $500, siguienteMetaRango = 1000)
+    // (Si la meta personal es $5000, siguienteMetaRango = 5000)
+    // --- FIN CAMBIO ---
 
-    // Show success feedback before closing
     const successFeedback = document.createElement('div');
     successFeedback.className = 'success-feedback';
     successFeedback.innerHTML = `
@@ -449,11 +502,9 @@ function handleConfirmGoal() {
     
     if (goalSetupModal) {
         goalSetupModal.appendChild(successFeedback);
-        
-        // Close after showing success
         setTimeout(() => {
             closeGoalSetupModal();
-            checkMissionProgress('SET_GOAL');
+            checkMissionProgress('SET_GOAL'); 
             loadDailyMissions();
             checkAppState();
         }, 1500);
@@ -541,3 +592,18 @@ document.addEventListener('click', (event) => {
         closeDepositModal();
     }
 });
+
+const RANGOS_DATA: RangoData[] = [
+    // Rango 0: Inactivo
+    { rango: 0, nombre: "Tierra Sola", meta: 0, recompensaPts: 0 },
+    // Rango 1: Se activa al poner la meta (Misión 'SET_GOAL' da los 100 Pts)
+    { rango: 1, nombre: "Semilla", meta: 1, recompensaPts: 100 }, 
+    // Rango 2: Se activa al llegar a $1,000
+    { rango: 2, nombre: "Planta Joven", meta: 1000, recompensaPts: 500 },
+    // Rango 3: Se activa al llegar a $5,000
+    { rango: 3, nombre: "Arbusto", meta: 5000, recompensaPts: 1000 },
+    // Rango 4: Se activa al llegar a $20,000
+    { rango: 4, nombre: "Árbol Fuerte", meta: 20000, recompensaPts: 2500 },
+    // Rango 5: Se activa al llegar a $50,000
+    { rango: 5, nombre: "Árbol Frutal", meta: 50000, recompensaPts: 0, recompensaCashback: 100 }
+];
