@@ -6,7 +6,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-
 }
 
 * {
@@ -16,12 +15,45 @@ body {
 /* --- Contenedor de la App --- */
 .app-container {
     width: 100%;
-    max-width: 100%; /* Ancho típico de un teléfono */
+    max-width: 420px; /* Ancho típico de un teléfono */
     background-color: #f9fafb; /* Fondo principal de la app (gris muy claro) */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    overflow: hidden; /* Oculta lo que se salga */
-    position: relative; /* Clave para el footer fijo */
+    overflow: hidden; 
+    position: relative; 
+    min-height: 100vh; /* Asegura que la app ocupe toda la pantalla */
     padding-bottom: 90px; /* Deja espacio para el footer */
+}
+
+/* --- Elementos de Estado y Onboarding --- */
+
+/* Ocultar elementos */
+.hidden {
+    display: none !important;
+}
+
+/* Estilo del overlay para modales */
+.modal-overlay {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    transition: opacity 0.2s ease;
+}
+
+/* Contenido genérico de modal centrado */
+.modal-content {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 380px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
 }
 
 /* --- 1. Cabecera Roja --- */
@@ -44,6 +76,36 @@ body {
     padding: 1.5rem;
 }
 
+/* --- ONBOARDING SECTION (Nueva) --- */
+.onboarding-container {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.onboarding-container .plant-icon {
+    font-size: 8rem; /* El emoji de la planta o semilla */
+    margin-bottom: 1.5rem;
+}
+
+.onboarding-container h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.onboarding-container p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+/* El botón usa la clase .btn-primary */
+
+
 /* --- 2.1. Tarjeta de Ahorro --- */
 .savings-card {
     background-color: #ffffff;
@@ -51,7 +113,7 @@ body {
     padding: 1.25rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     display: grid;
-    grid-template-columns: 3fr 1fr; /* Columnas para info y rendimiento */
+    grid-template-columns: 3fr 1fr; 
     align-items: start;
     row-gap: 0.5rem;
     border: 1px solid #d1d5db;
@@ -74,8 +136,8 @@ body {
 }
 
 .badge-rendimiento {
-    background-color: #dcfce7; /* Verde claro */
-    color: #166534; /* Verde oscuro */
+    background-color: #dcfce7; 
+    color: #166534; 
     font-size: 0.8rem;
     font-weight: 600;
     padding: 0.25rem 0.75rem;
@@ -90,9 +152,9 @@ body {
 }
 
 .progress-bar {
-    grid-column: 1 / -1; /* Ocupa ambas columnas */
+    grid-column: 1 / -1; 
     width: 100%;
-    background-color: #e5e7eb; /* Gris de fondo de la barra */
+    background-color: #e5e7eb; 
     height: 8px;
     border-radius: 4px;
     margin-top: 1rem;
@@ -101,25 +163,26 @@ body {
 
 .progress-fill {
     height: 100%;
-    background-color: #e63946; /* Rojo de progreso */
+    background-color: #e63946; 
     border-radius: 4px;
+    transition: width 0.3s ease;
 }
 
 /* --- 2.2. Sección de la Planta --- */
 .plant-section {
     text-align: center;
-    padding: 2.5rem 0; /* Espaciado vertical */
+    padding: 2.5rem 0;
 }
 
 .plant-image {
-    font-size: 7rem; /* Tamaño del emoji */
+    font-size: 7rem;
     line-height: 1;
 }
 
 /* --- 2.3. Grid de Estadísticas --- */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 columnas iguales */
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.75rem;
 }
 
@@ -183,8 +246,8 @@ body {
     border-bottom: 1px solid #DBDADE;
 }
 
-.mission-card3{
-    border-bottom: 0px solid #DBDADE;
+.mission-card:last-child {
+    border-bottom: none;
 }
 
 .mission-icon-bg {
@@ -192,15 +255,22 @@ body {
     height: 40px;
     border-radius: 8px;
     margin-right: 1rem;
-    flex-shrink: 0; /* Evita que se encoja */
+    flex-shrink: 0; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
 }
-/* Colores de los iconos de misión */
-.bg-green { background-color: #34d399; }
-.bg-pink { background-color: #f472b6; }
-.bg-orange { background-color: #fb923c; }
+
+/* --- Colores de los iconos de misión (Nuevos) --- */
+.bg-yellow-200 { background-color: #fef9c3; color: #a16207; } /* SET_GOAL */
+.bg-green-200 { background-color: #d1fae5; color: #065f46; } /* DEPOSIT */
+.bg-pink-200 { background-color: #fce7f3; color: #9d174d; } /* DEPOSIT (Alto) */
+.bg-blue-200 { background-color: #dbeafe; color: #1e40af; } /* READ_TIP */
+
 
 .mission-details {
-    flex-grow: 1; /* Empuja la flecha a la derecha */
+    flex-grow: 1; 
 }
 
 .mission-details .mission-title {
@@ -215,10 +285,6 @@ body {
     color: #6b7280;
 }
 
-.mission-details .mission-rewards span {
-    margin-right: 0.5rem;
-}
-
 .mission-arrow {
     font-size: 1.5rem;
     color: #e63946;
@@ -227,7 +293,7 @@ body {
 
 /* --- 3. Footer Fijo --- */
 .app-footer {
-    position: absolute;
+    position: fixed; /* Cambiado a fixed para funcionar mejor con el modal */
     bottom: 0;
     left: 0;
     right: 0;
@@ -236,55 +302,54 @@ body {
     border-top: 1px solid #e5e7eb;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
     z-index: 10;
-    
-    /* --- CAMBIOS --- */
-    /* Usamos flex para alinear los botones */
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem; /* Espacio entre los dos botones */
+    gap: 1rem; 
+    max-width: 420px; /* Asegura que el footer no se salga del contenedor */
+    margin: 0 auto;
 }
 
-/* Estilo del botón principal (Depositar) */
-.btn-depositar {
-    width: 50%;     /* Cada botón ocupa la mitad */
-    flex-grow: 1;   /* Crece para llenar el espacio */
+/* Estilo del botón principal (Depositar) y Bonificaciones */
+.btn-primary, .btn-secondary, .btn-depositar {
+    width: 100%;
+    border: none;
+    padding: 1rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #e63946; /* Rojo principal */
+    color: white;
+}
+
+/* Estilos de Botones Específicos del Footer (usados en .btn-depositar, etc.) */
+.app-footer .btn-depositar {
+    width: 100%; 
     background-color: #e63946;
     color: white;
-    border: 2px solid #e63946; /* Añadimos borde para consistencia */
+    border: 2px solid #e63946;
     padding: 1rem;
     font-size: 1.1rem;
     font-weight: 600;
-    border-radius: 9999px; /* Totalmente redondeado */
-    cursor: pointer;
-}
-
-/* --- NUEVO ESTILO --- */
-/* Estilo del botón secundario (Bonificaciones) */
-.btn-bonificaciones {
-    width: 50%;
-    flex-grow: 1;
-    background-color: #f9fafb; /* Fondo gris/blanco */
-    color: #e63946; /* Texto rojo */
-    border: 2px solid #e63946; /* Borde rojo */
-    /* El padding se ajusta por el borde para que se vean del mismo alto */
-    padding: calc(1rem - 2px); 
-    font-size: 1.1rem;
-    font-weight: 600;
     border-radius: 9999px;
-    cursor: pointer;
+}
+/* Estilo del botón de Onboarding */
+.onboarding-container .btn-primary {
+    padding: 1rem;
+    border-radius: 9999px;
 }
 
-/* --- 4. Bottom Sheet Modal (Deslizable desde abajo) --- */
 
-/* Clase 'helper' para ocultar/mostrar */
-.hidden {
-    display: none !important;
-}
+/* --- MODAL DE DEPÓSITO (Bottom Sheet) --- */
 
-/* Overlay (fondo oscuro) */
-.bottom-sheet-overlay {
-    position: fixed; /* Ahora es 'fixed' para cubrir toda la ventana, no solo la app */
+/* Adaptando las clases existentes de tu amigo */
+.modal-overlay {
+    position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
@@ -292,120 +357,28 @@ body {
     background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
-    align-items: flex-end; /* Alinea el contenido a la parte inferior */
+    align-items: flex-end; /* Alinear a la parte inferior para Bottom Sheet */
     z-index: 20;
-    opacity: 0; /* Inicialmente transparente */
-    visibility: hidden; /* Inicialmente invisible */
-    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* Clase para mostrar el overlay */
-.bottom-sheet-overlay.active {
-    opacity: 1;
-    visibility: visible;
+.modal-content.goal-setup-content {
+    align-self: center; /* Centrar el modal de meta */
+    width: 90%;
 }
 
-/* Contenido del modal que se desliza */
-.bottom-sheet-content {
-    background-color: #ffffff;
-    width: 100%;
-    max-width: 400px; /* Ancho máximo igual al contenedor de la app */
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    padding: 2rem 1.5rem; /* Ajustar padding para que coincida con la imagen */
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
-    transform: translateY(100%); /* Inicialmente fuera de la pantalla, abajo */
-    transition: transform 0.3s ease;
-}
-
-/* Clase para que el contenido se deslice hacia arriba */
-.bottom-sheet-overlay.active .bottom-sheet-content {
-    transform: translateY(0);
-}
-
-/* Estilos comunes para las vistas dentro del modal */
 .modal-view {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem; /* Espacio entre elementos */
-    text-align: center; /* Centrar texto por defecto */
-}
-
-.modal-view h3 {
-    margin: 0;
-    font-size: 1.3rem; /* Tamaño de fuente del título */
-    color: #111827;
+    gap: 1.25rem;
+    text-align: center;
 }
 
 .input-label {
-    align-self: flex-start; /* Alinea la etiqueta a la izquierda */
+    align-self: flex-start;
     font-size: 0.9rem;
     color: #374151;
     font-weight: 500;
-    margin-bottom: -0.5rem; /* Ajustar espacio para que quede más pegado al input */
-}
-
-/* Custom Select (Dropdown) */
-.custom-select-wrapper {
-    position: relative;
-    width: 100%;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background-color: #ffffff;
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1rem; /* Padding similar al input */
-}
-
-.custom-select-wrapper .card-icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 0.75rem;
-}
-
-.custom-select {
-    flex-grow: 1;
-    border: none;
-    background: none;
-    outline: none;
-    font-size: 1rem;
-    color: #111827;
-    /* Quitar la flecha por defecto del select en navegadores */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    padding-right: 1.5rem; /* Espacio para nuestra flecha custom */
-}
-
-.select-arrow {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%) rotate(45deg); /* Gira para hacer una flecha de dropdown */
-    width: 8px;
-    height: 8px;
-    border-right: 2px solid #6b7280;
-    border-bottom: 2px solid #6b7280;
-    pointer-events: none; /* Asegura que se pueda hacer clic en el select */
-}
-
-
-.modal-view input[type="number"] {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    color: #111827;
-    text-align: left; /* Alineación del texto a la izquierda como en la imagen */
-    /* Evita que aparezcan las flechas en el input */
-    -moz-appearance: textfield;
-}
-
-.modal-view input[type="number"]::-webkit-outer-spin-button,
-.modal-view input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+    margin-bottom: -0.5rem;
 }
 
 /* Estilos de botones generales para el modal */
@@ -416,46 +389,75 @@ body {
     padding: 1rem;
     font-size: 1.05rem;
     font-weight: 600;
-    border-radius: 8px; /* Ligeramente más cuadrado que el footer */
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
 }
 
 .modal-view .btn-primary {
-    background-color: #e63946; /* Rojo */
+    background-color: #e63946;
     color: white;
-}
-.modal-view .btn-primary:hover {
-    background-color: #d62d3c;
 }
 
 .modal-view .btn-secondary {
-    background-color: #f3f4f6; /* Gris claro */
-    color: #374151; /* Gris oscuro */
+    background-color: #f3f4f6;
+    color: #374151;
     border: 1px solid #d1d5db;
 }
-.modal-view .btn-secondary:hover {
-    background-color: #e5e7eb;
+
+/* Modal Animations */
+.modal-transition {
+    transition: opacity 0.3s ease-in-out;
 }
 
-/* --- Estilos para la Vista de Éxito --- */
+/* Error Feedback */
+.shake-animation {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.error-message {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    animation: slideIn 0.3s ease;
+}
+
+/* Success Feedback */
+.success-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
 .success-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #10b981; /* Verde esmeralda */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto 1rem; /* Centrar y margen inferior */
-}
-
-.success-icon .checkmark {
+    background-color: #10b981;
     color: white;
-    font-size: 2.5rem;
-    font-weight: bold;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 1rem;
 }
 
-.modal-view#success-view h3 {
-    margin-bottom: 2rem;
+/* Animations */
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

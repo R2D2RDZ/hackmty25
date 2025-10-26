@@ -4,7 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Ahorro</title>
+    <!-- Asumiendo que 'src/style.css' contiene tus estilos. Si no existe, usa Tailwind CDN en un proyecto real. -->
     <link rel="stylesheet" href="src/style.css">
+
+    <!-- Estilos Adicionales Necesarios para los nuevos elementos -->
+    <style>
+        .app-container { max-width: 420px; margin: 0 auto; background-color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        .app-header { background-color: #e63946; color: white; padding: 1rem 1.5rem; display: flex; align-items: center; }
+        .content-area { flex-grow: 1; padding: 0 1rem; }
+        /* Nuevos estilos para la sección de Onboarding */
+        .onboarding-container { text-align: center; padding: 3rem 1.5rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .onboarding-container h2 { font-size: 1.8rem; font-weight: 700; color: #333; margin-bottom: 0.5rem; }
+        .onboarding-container p { color: #666; margin-bottom: 2rem; }
+        .onboarding-container .plant-icon { font-size: 8rem; margin-bottom: 1.5rem; }
+
+        /* Estilos del Modal de Configuración */
+        .goal-setup-content { padding: 1.5rem; }
+        .goal-setup-content h3 { margin-bottom: 1.5rem; text-align: center; font-weight: 600;}
+        .goal-setup-content label { display: block; margin-top: 1rem; margin-bottom: 0.5rem; font-weight: 500; color: #374151; }
+        .goal-setup-content input, .goal-setup-content select { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; margin-bottom: 1rem; font-size: 1rem; }
+    </style>
 </head>
 <body>
 
@@ -14,77 +33,87 @@
             <span class="back-arrow">&lt;</span>
         </header>
 
-        <main class="content-area">
+        <!-- +++ 1. SECCIÓN DE ONBOARDING (RANGO 0) +++ -->
+        <section id="onboarding-section" class="onboarding-container">
+            <div class="plant-icon">🌱</div>
+            <h2>¡Comienza tu Aventura de Ahorro!</h2>
+            <p>Define una meta y frecuencia para que tu planta empiece a crecer.</p>
+            <button id="start-goal-btn" class="btn-primary" style="width: 100%; max-width: 300px; padding: 1rem;">Establecer Meta</button>
+        </section>
 
-            <section class="savings-card">
-                <div class="savings-info">
-                    <h2 id="total-ahorrado-display">Has ahorrado $1,000</h2>
-                    <p id="meta-display"class="meta">Meta $5,000 - Faltan $4,000</p>
-                </div>
-                <div class="savings-yield">
-                    <span class="badge-rendimiento">Rendimiento</span>
-                    <p class="anual">7.5% Anual</p>
-                </div>
-                <div class="progress-bar">
-                    <div id="progress-bar-fill" class="progress-fill" style="width: 20%;"></div>
-                </div>
-            </section>
+        <!-- +++ 2. CONTENIDO PRINCIPAL DE LA APP (RANGO 1+) +++ -->
+        <!-- NOTA: Está oculto por defecto en el JS inicial hasta que se define una meta. -->
+        <div id="main-app-content" class="hidden">
+            <main class="content-area">
 
-            <section class="plant-section">
-                <div class="plant-image">🪴</div>
-            </section>
+                <section class="savings-card">
+                    <div class="savings-info">
+                        <h2 id="total-ahorrado-display">Has ahorrado $0.00</h2>
+                        <p id="meta-display"class="meta">Meta $0.00 - Faltan $0.00</p>
+                    </div>
+                    <div class="savings-yield">
+                        <span class="badge-rendimiento">Puntos:</span>
+                        <!-- ID añadido para mostrar los puntos -->
+                        <p id="total-puntos-display" class="anual">0</p>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progress-bar-fill" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </section>
 
-            <section class="stats-grid">
-                <!-- +++ AÑADIDO: Tarjeta de Puntos (se había perdido) +++ -->
-                <div class="stat-card">
-                    <span class="stat-icon">🪙</span>
-                    <p>Puntos</p>
-                    <p class="stat-value" id="total-puntos-display">100</p>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-icon">🔥</span>
-                    <p>Racha</p>
-                    <p class="stat-value red">5 Días</p>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-icon">💧</span>
-                    <p>Agua</p>
-                    <p class="stat-value">10/20</p>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-icon">☀️</span>
-                    <p>Sol</p>
-                    <p class="stat-value">5/10</p>
-                </div>
-                <!-- El fertilizante se movió/quitó, lo dejo así para respetar a tu amigo -->
-            </section>
+                <section class="plant-section" id="plant-container">
+                    <!-- Aquí se renderizará el modelo 3D de Three.js -->
+                    <div class="plant-image">🪴</div> 
+                </section>
 
-            <section class="missions-section">
-                <h3>Misiones de hoy</h3>
-                <!-- +++ MODIFICADO: Contenedor de misiones +++ -->
-                <!-- Se quitan las misiones hard-codeadas y se añade un ID -->
-                <div class="mission-list" id="mission-list-container">
-                    <!-- Las misiones se generarán dinámicamente aquí -->
-                </div>
-            </section>
+                <section class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-icon">🔥</span>
+                        <p>Racha</p>
+                        <p class="stat-value">5 días</p>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">💧</span>
+                        <p>Agua</p>
+                        <p class="stat-value">10/20</p>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">☀️</span>
+                        <p>Sol</p>
+                        <p class="stat-value">5/10</p>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">🌼</span>
+                        <p>Fertilizante</p>
+                        <p class="stat-value">5/10</p>
+                    </div>
+                </section>
 
-        </main>
+                <section class="missions-section">
+                    <h3>Misiones de hoy</h3>
+                    <!-- El contenedor ya estaba, solo le quitamos las tarjetas de ejemplo -->
+                    <div class="mission-list" id="mission-list-container">
+                        
+                    </div>
+                </section>
 
-        <footer class="app-footer">
-            <button class="btn-bonificaciones">Bonificaciones</button>
-            <button class="btn-depositar">Depositar</button>
-        </footer>
+            </main>
 
-        <!-- El modal de tu amigo (sin cambios) -->
-        <div id="bottom-sheet-modal" class="bottom-sheet-overlay hidden">
-            <div class="bottom-sheet-content">
+            <footer class="app-footer">
+                <button class="btn-depositar">Depositar</button>
+            </footer>
+        </div>
 
+
+        <!-- MODAL DE DEPÓSITO (Bottom Sheet - Lógica de tu amigo) -->
+        <div id="bottom-sheet-modal" class="modal-overlay hidden">
+             <div class="modal-content">
                 <div id="transfer-form-view" class="modal-view">
-                    <h3>Transferir</h3>
-                    
+                    <!-- Contenido del modal de depósito -->
                     <label for="origin-account-select" class="input-label">Cuenta origen</label>
                     <div class="custom-select-wrapper">
-                        <img src="https://via.placeholder.com/24" alt="Card Icon" class="card-icon"> <select id="origin-account-select" class="custom-select">
+                        <img src="https://via.placeholder.com/24" alt="Card Icon" class="card-icon"> 
+                        <select id="origin-account-select" class="custom-select">
                             <option value="1234-5678-9101" selected>1234-5678-9101</option>
                             <option value="xxxx-xxxx-xxxx-xxxx">Otra Cuenta</option>
                         </select>
@@ -109,6 +138,25 @@
             </div>
         </div>
 
+        <!-- +++ 3. MODAL DE CONFIGURACIÓN DE META (Para Rango 0) +++ -->
+        <div id="goal-setup-modal" class="modal-overlay hidden">
+            <div class="modal-content goal-setup-content">
+                <h3>Define tu Meta de Ahorro</h3>
+
+                <label for="goal-amount-input">Monto total de la meta ($)</label>
+                <input type="number" id="goal-amount-input" placeholder="Ej: 5000.00" min="1" value="1000.00">
+
+                <label for="goal-frequency-select">Frecuencia de ahorro deseada</label>
+                <select id="goal-frequency-select">
+                    <option value="Diario">Diario</option>
+                    <option value="Semanal" selected>Semanal</option>
+                    <option value="Mensual">Mensual</option>
+                </select>
+
+                <button id="confirm-goal-btn" class="btn-primary">Confirmar Meta</button>
+            </div>
+        </div>
+        
     </div>
     <!-- Asegúrate que la ruta a main.ts sea correcta -->
     <script type="module" src="src/main.ts"></script>
