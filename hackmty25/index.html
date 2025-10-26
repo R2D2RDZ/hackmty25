@@ -35,6 +35,12 @@
             </section>
 
             <section class="stats-grid">
+                <!-- +++ AÑADIDO: Tarjeta de Puntos (se había perdido) +++ -->
+                <div class="stat-card">
+                    <span class="stat-icon">🪙</span>
+                    <p>Puntos</p>
+                    <p class="stat-value" id="total-puntos-display">100</p>
+                </div>
                 <div class="stat-card">
                     <span class="stat-icon">🔥</span>
                     <p>Racha</p>
@@ -50,56 +56,15 @@
                     <p>Sol</p>
                     <p class="stat-value">5/10</p>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-icon">🌼</span>
-                    <p>Fertilizante</p>
-                    <p class="stat-value">5/10</p>
-                </div>
+                <!-- El fertilizante se movió/quitó, lo dejo así para respetar a tu amigo -->
             </section>
 
             <section class="missions-section">
                 <h3>Misiones de hoy</h3>
-                <div class="mission-list">
-                    
-                    <div class="mission-card">
-                        <div class="mission-icon-bg bg-green"></div>
-                        <div class="mission-details">
-                            <p class="mission-title">Deposita 10 pesos</p>
-                            <p class="mission-rewards">
-                                <span>🪙 1</span>
-                                <span>💧 3</span>
-                                <span>🌼 2</span>
-                            </p>
-                        </div>
-                        <span class="mission-arrow">&gt;</span>
-                    </div>
-
-                    <div class="mission-card">
-                        <div class="mission-icon-bg bg-pink"></div>
-                        <div class="mission-details">
-                            <p class="mission-title">Lee este tip financiero</p>
-                            <p class="mission-rewards">
-                                <span>🪙 2</span>
-                                <span>💧 2</span>
-                                <span>🌼 2</span>
-                            </p>
-                        </div>
-                        <span class="mission-arrow">&gt;</span>
-                    </div>
-
-                    <div class="mission-card mission-card3">
-                        <div class="mission-icon-bg bg-orange"></div>
-                        <div class="mission-details">
-                            <p class="mission-title">Lee tu consejo del día</p>
-                            <p class="mission-rewards">
-                                <span>🪙 2</span>
-                                <span>💧 2</span>
-                                <span>🌼 2</span>
-                            </p>
-                        </div>
-                        <span class="mission-arrow">&gt;</span>
-                    </div>
-
+                <!-- +++ MODIFICADO: Contenedor de misiones +++ -->
+                <!-- Se quitan las misiones hard-codeadas y se añade un ID -->
+                <div class="mission-list" id="mission-list-container">
+                    <!-- Las misiones se generarán dinámicamente aquí -->
                 </div>
             </section>
 
@@ -110,6 +75,7 @@
             <button class="btn-depositar">Depositar</button>
         </footer>
 
+        <!-- El modal de tu amigo (sin cambios) -->
         <div id="bottom-sheet-modal" class="bottom-sheet-overlay hidden">
             <div class="bottom-sheet-content">
 
@@ -144,7 +110,8 @@
         </div>
 
     </div>
-    <script src="src/main.ts"></script>
+    <!-- Asegúrate que la ruta a main.ts sea correcta -->
+    <script type="module" src="src/main.ts"></script>
 </body>
 
 </html>
