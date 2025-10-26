@@ -453,6 +453,16 @@ function handleDeposit() {
 // --- EVENT LISTENERS ---
 
 document.addEventListener('DOMContentLoaded', () => {
+    const pointsDisplay = document.getElementById('points-display');
+    
+    // Get points from localStorage (set by main app)
+    const currentPoints = Math.floor(Number(localStorage.getItem('totalPuntos')) || 0);
+    
+    // Update display
+    if (pointsDisplay) {
+        pointsDisplay.textContent = currentPoints.toString();
+    }
+
     // 1. Onboarding
     if (startGoalBtn) startGoalBtn.addEventListener('click', openGoalSetupModal);
     if (confirmGoalBtn) confirmGoalBtn.addEventListener('click', handleConfirmGoal);
