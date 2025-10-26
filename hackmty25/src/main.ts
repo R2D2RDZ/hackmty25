@@ -1,16 +1,76 @@
-// --- ESTADO INICIAL DE LA APLICACIÓN (RANGO 0) ---
-let currentRango = 0; // 0: Onboarding, 1: Semilla, 2: Árbol (Meta Alcanzada)
+// --- 1. DEFINICIÓN DE INTERFACES ---
+// (Define la "forma" de nuestros datos)
+
+interface RangoData {
+    rango: number;
+    nombre: string;
+    meta: number;
+    recompensaPts: number;
+    recompensaCashback?: number; // <-- El signo '?' lo hace opcional
+}
+
+interface Mission {
+    id: string; title: string; type: 'DEPOSIT_ONCE' | 'SET_GOAL' | 'READ_TIP';
+    params: { minAmount?: number };
+    rewards: { points: number; water?: number; sun?: number };
+    iconColor: string;
+}
+
+interface ModalState {
+    isAnimating: boolean;
+    activeModal: string | null;
+}
+
+// --- 2. CONSTANTES GLOBALES ---
+// (Datos que no cambian)
+
+// ¡MOVIMOS ESTO AL INICIO!
+const RANGOS_DATA: RangoData[] = [
+    // Rango 0: Inactivo
+    { rango: 0, nombre: "Tierra Sola", meta: 0, recompensaPts: 0 },
+    // Rango 1: Se activa al poner la meta (Misión 'SET_GOAL' da los 100 Pts)
+    { rango: 1, nombre: "Semilla", meta: 1, recompensaPts: 100 }, 
+    // Rango 2: Se activa al llegar a $1,000
+    { rango: 2, nombre: "Planta Joven", meta: 1000, recompensaPts: 500 },
+    // Rango 3: Se activa al llegar a $5,000
+    { rango: 3, nombre: "Arbusto", meta: 5000, recompensaPts: 1000 },
+    // Rango 4: Se activa al llegar a $20,000
+    { rango: 4, nombre: "Árbol Fuerte", meta: 20000, recompensaPts: 2500 },
+    // Rango 5: Se activa al llegar a $50,000
+    { rango: 5, nombre: "Árbol Frutal", meta: 50000, recompensaPts: 0, recompensaCashback: 100 }
+];
+
+const missionDatabase: Mission[] = [
+    { id: 'set_goal_1', title: 'Establecer tu primera meta', type: 'SET_GOAL', params: {}, rewards: { points: 100, water: 5 }, iconColor: 'bg-yellow-200' },
+    { id: 'deposit_10', title: 'Deposita $10 pesos', type: 'DEPOSIT_ONCE', params: { minAmount: 10 }, rewards: { points: 2, water: 2 }, iconColor: 'bg-green-200' },
+    { id: 'deposit_50', title: '¡Buen inicio! Deposita $50', type: 'DEPOSIT_ONCE', params: { minAmount: 50 }, rewards: { points: 10, water: 5 }, iconColor: 'bg-pink-200' },
+    { id: 'read_tip_1', title: 'Lee un tip financiero', type: 'READ_TIP', params: {}, rewards: { points: 5 }, iconColor: 'bg-blue-200' }
+];
+
+const PUNTOS_POR_PESO = 0.1; 
+const PUNTOS_BONO_RANGO_2 = 500; // (No se usa actualmente, pero lo guardamos)
+
+// --- 3. ESTADO DE LA APLICACIÓN ---
+// (Variables que cambian)
+
+let currentRango = 0; // 0: Onboarding, 1: Semilla, etc.
 let totalAhorrado = 0.0;
 let totalPuntos = 0;
-let metaAhorro = 0.0; // El usuario define esto en el onboarding
+let metaAhorro = 0.0; // La meta personal del usuario
 let metaFrecuencia: string | null = null;
-let siguienteMetaRango = 1000.00; // Valor de la primera meta para subir de Rango (ej. $1,000 MXN)
+let siguienteMetaRango = 1000.00; // La meta del *siguiente* rango
 
-// --- REGLA DE NEGOCIO ---
-const PUNTOS_POR_PESO = 0.1; 
-const PUNTOS_BONO_RANGO_2 = 500; // Bono por subir al Rango 2 (Árbol)
+let activeDailyMissions: Mission[] = [];
+let completedDailyMissionIds: string[] = [];
 
-// --- SELECCIÓN DE ELEMENTOS DEL DOM ---
+const modalState: ModalState = {
+    isAnimating: false,
+    activeModal: null
+};
+
+// --- 4. SELECCIÓN DE ELEMENTOS DEL DOM ---
+// (Conectamos el código con el HTML)
+
 const mainAppContent = document.getElementById('main-app-content') as HTMLDivElement | null;
 const onboardingSection = document.getElementById('onboarding-section') as HTMLDivElement | null;
 
@@ -26,13 +86,10 @@ const totalAhorradoDisplay = document.getElementById('total-ahorrado-display') a
 const metaDisplay = document.getElementById('meta-display') as HTMLParagraphElement | null;
 const progressBarFill = document.getElementById('progress-bar-fill') as HTMLDivElement | null;
 const totalPuntosDisplay = document.getElementById('total-puntos-display') as HTMLParagraphElement | null;
-
-// --- CAMBIO IMPORTANTE ---
-// Ahora seleccionamos el <img> que pusiste en index.html
-const plantImage = document.getElementById('plant-image') as HTMLImageElement | null; 
+const plantImage = document.getElementById('plant-image') as HTMLImageElement | null; // La imagen de la planta
 const openDepositModalBtn = document.querySelector('.btn-depositar') as HTMLButtonElement | null;
 
-// Modal de Depósito (adaptado al bottom-sheet de index.html)
+// Modal de Depósito
 const bottomSheetOverlay = document.getElementById('bottom-sheet-modal') as HTMLDivElement | null;
 const transferFormView = document.getElementById('transfer-form-view') as HTMLDivElement | null;
 const successView = document.getElementById('success-view') as HTMLDivElement | null;
@@ -44,45 +101,15 @@ const closeSuccessBtn = document.getElementById('close-success-btn') as HTMLButt
 // Misiones
 const missionListContainer = document.getElementById('mission-list-container') as HTMLDivElement | null;
 
-interface RangoData {
-    rango: number;
-    nombre: string;
-    meta: number;
-    recompensaPts: number;
-    recompensaCashback?: number; // <-- El signo '?' lo hace opcional
-}
-// --- SISTEMA DE MISIONES ---
-interface Mission {
-    id: string; title: string; type: 'DEPOSIT_ONCE' | 'SET_GOAL' | 'READ_TIP';
-    params: { minAmount?: number };
-    rewards: { points: number; water?: number; sun?: number };
-    iconColor: string;
-}
 
-// Catálogo de Misiones
-const missionDatabase: Mission[] = [
-    { id: 'set_goal_1', title: 'Establecer tu primera meta', type: 'SET_GOAL', params: {}, rewards: { points: 100, water: 5 }, iconColor: 'bg-yellow-200' },
-    { id: 'deposit_10', title: 'Deposita $10 pesos', type: 'DEPOSIT_ONCE', params: { minAmount: 10 }, rewards: { points: 2, water: 2 }, iconColor: 'bg-green-200' },
-    { id: 'deposit_50', title: '¡Buen inicio! Deposita $50', type: 'DEPOSIT_ONCE', params: { minAmount: 50 }, rewards: { points: 10, water: 5 }, iconColor: 'bg-pink-200' },
-    { id: 'read_tip_1', title: 'Lee un tip financiero', type: 'READ_TIP', params: {}, rewards: { points: 5 }, iconColor: 'bg-blue-200' }
-];
+// --- 5. LÓGICA DE MISIONES ---
 
-let activeDailyMissions: Mission[] = [];
-let completedDailyMissionIds: string[] = [];
-
-/**
- * Carga las misiones basadas en el Rango actual.
- * - Rango 0: Solo la misión de establecer meta.
- * - Rango 1+: Misiones diarias normales (depósito, etc.).
- */
 function loadDailyMissions() {
     completedDailyMissionIds = []; 
     if (currentRango === 0) {
-        // Rango 0: Solo la misión de establecer meta
         const metaMission = missionDatabase.find(m => m.type === 'SET_GOAL');
         activeDailyMissions = metaMission ? [metaMission] : [];
     } else {
-        // Rango 1+: Cargar misiones diarias
         activeDailyMissions = missionDatabase.filter(m => m.type !== 'SET_GOAL').slice(0, 3);
     }
 }
@@ -108,7 +135,6 @@ function renderMissions() {
         const isCompleted = completedDailyMissionIds.includes(mission.id);
         
         const missionCard = document.createElement('div');
-        // Añadimos efectos de hover y transición
         missionCard.className = `
             mission-card flex items-center p-4 
             ${index !== activeDailyMissions.length - 1 ? 'border-b border-gray-100' : ''}
@@ -117,7 +143,6 @@ function renderMissions() {
             ${isCompleted ? 'opacity-75' : ''}
         `;
         
-        // Ícono con animación al hacer hover
         const iconBg = document.createElement('div');
         iconBg.className = `
             w-12 h-12 rounded-full flex items-center justify-center text-xl mr-4 
@@ -126,7 +151,6 @@ function renderMissions() {
         `;
         iconBg.innerHTML = isCompleted ? '✅' : (mission.type === 'SET_GOAL' ? '⭐' : '🎯');
 
-        // Contenido con mejor espaciado y tipografía
         const details = document.createElement('div');
         details.className = 'flex-grow';
         details.innerHTML = `
@@ -148,7 +172,6 @@ function renderMissions() {
             </div>
         `;
 
-        // Estado con animación
         const statusIcon = document.createElement('span');
         statusIcon.className = `
             text-xl ml-4 transform transition-transform duration-200
@@ -159,12 +182,10 @@ function renderMissions() {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>`;
 
-        // Ensamblamos la tarjeta
         missionCard.appendChild(iconBg);
         missionCard.appendChild(details);
         missionCard.appendChild(statusIcon);
 
-        // Efecto de clic
         missionCard.addEventListener('click', () => {
             if (!isCompleted) missionCard.classList.add('active');
         });
@@ -200,10 +221,11 @@ function completeMission(mission: Mission) {
     actualizarUI();
 }
 
-// --- GESTIÓN DE RANGOS ---
+// --- 6. LÓGICA DE RANGOS Y UI ---
 
 /**
  * Revisa si el ahorro total cumple la meta para subir de rango.
+ * ¡Incluye la lógica especial para Rango 1 -> 2!
  */
 function checkRangoUpgrade() {
     if (currentRango >= 5) return; // Ya está en el rango máximo
@@ -214,7 +236,7 @@ function checkRangoUpgrade() {
     // --- LÓGICA DE CONDICIÓN DE RANGO ---
     let rankUpConditionMet = false;
 
-    // --- CAMBIO CLAVE: Lógica especial para Rango 1 -> 2 ---
+    // Lógica especial para Rango 1 -> 2
     if (currentRango === 1 && proximoRangoIndex === 2) {
         const metaRango2Fija = proximoRangoData.meta; // $1,000
         const metaPersonalUsuario = metaAhorro; // La que guardamos en onboarding
@@ -226,39 +248,37 @@ function checkRangoUpgrade() {
     }
     // Lógica normal para Rango 0->1 (onboarding) y Rango 2+
     else {
+        // (Rango 0->1 se maneja en handleConfirmGoal)
+        // Esta condición es para Rango 2 -> 3, 3 -> 4, etc.
         if (totalAhorrado >= proximoRangoData.meta) {
             rankUpConditionMet = true;
         }
     }
-    // --- FIN CAMBIO ---
-
+    // --- FIN LÓGICA DE CONDICIÓN ---
 
     // Loop por si un depósito grande sube múltiples rangos a la vez
-    // (Ej. Rango 2 -> 3 -> 4)
     while (currentRango < 5 && rankUpConditionMet) {
         
         // --- SUBIÓ DE RANGO ---
         currentRango = proximoRangoData.rango;
         
-        // 1. Dar recompensas de Puntos
         if (proximoRangoData.recompensaPts > 0) {
             totalPuntos += proximoRangoData.recompensaPts;
             console.log(`¡RANGO UPGRADE! Rango ${currentRango} (${proximoRangoData.nombre}) desbloqueado. Bono de +${proximoRangoData.recompensaPts} puntos.`);
         }
         
-        // 2. Dar recompensa de Cashback (si la hay)
         if (proximoRangoData.recompensaCashback) {
             console.log(`¡FELICIDADES! Rango ${currentRango} alcanzado. ¡Recibes $${proximoRangoData.recompensaCashback} de Cashback!`);
         }
 
-        // 3. Actualizar la variable 'siguienteMetaRango' para la UI
+        // Actualizar la variable 'siguienteMetaRango' para la UI
         if (currentRango < 5) {
             siguienteMetaRango = RANGOS_DATA[currentRango + 1].meta;
         } else {
             siguienteMetaRango = proximoRangoData.meta;
         }
 
-        // 4. Preparar el loop para checar el *siguiente* rango (por si lo alcanzó también)
+        // Preparar el loop para checar el *siguiente* rango (por si lo alcanzó también)
         proximoRangoIndex = currentRango + 1;
         if (proximoRangoIndex <= 5) {
             proximoRangoData = RANGOS_DATA[proximoRangoIndex];
@@ -270,8 +290,6 @@ function checkRangoUpgrade() {
     }
 }
 
-// --- FLUJO PRINCIPAL DE ONBOARDING Y ESTADO ---
-
 function formatCurrency(amount: number): string {
     return amount.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
 }
@@ -281,132 +299,131 @@ function formatCurrency(amount: number): string {
  */
 function checkAppState() {
     if (currentRango === 0) {
-        // RANGO 0: Mostrar Onboarding
         if (onboardingSection) onboardingSection.classList.remove('hidden');
         if (mainAppContent) mainAppContent.classList.add('hidden');
-        loadDailyMissions(); // Carga solo la misión de "Establecer Meta"
+        loadDailyMissions();
     } else {
-        // RANGO 1 o 2: Mostrar App Principal
         if (onboardingSection) onboardingSection.classList.add('hidden');
         if (mainAppContent) mainAppContent.classList.remove('hidden');
-        // Si acabamos de pasar de Rango 0, loadDailyMissions ya se llamó en handleConfirmGoal
         actualizarUI();
     }
 }
 
-// --- NUEVA FUNCIÓN ---
 /**
- * Actualiza la imagen de la planta basándose en el progreso.
- * El progreso es un valor de 0 a 100.
- * Asignamos 6 rangos (0-5) para las imágenes.
+ * ¡FUNCIÓN CORREGIDA!
+ * Actualiza la imagen de la planta basándose en el 'currentRango' (0-5),
+ * NO en el 'progreso'.
  */
-function updatePlantImage(progress: number) {
+function updatePlantImage() { // <-- PARÉNTESIS VACÍOS
     if (!plantImage) return;
 
-    let imageIndex = 0; // Rango 0 por defecto (plant-0.png)
+    let imageIndex = 0; 
 
-    if (progress >= 100) {
-        imageIndex = 5; // Rango 5: Meta alcanzada (plant-5.png)
-    } else if (progress >= 80) {
-        imageIndex = 4; // Rango 4 (plant-4.png)
-    } else if (progress >= 60) {
-        imageIndex = 3; // Rango 3 (plant-3.png)
-    } else if (progress >= 40) {
-        imageIndex = 2; // Rango 2 (plant-2.png)
-    } else if (progress >= 20) {
-        imageIndex = 1; // Rango 1 (plant-1.png)
-    } 
-    // Si es < 20, se queda en imageIndex = 0
+    switch (currentRango) { // <-- Se basa en 'currentRango'
+        case 0: imageIndex = 0; break; // Rango 0: Tierra Sola (fase_0.png)
+        case 1: imageIndex = 1; break; // Rango 1: Semilla (fase_1.png)
+        case 2: imageIndex = 2; break; // Rango 2: Planta Joven (fase_2.png)
+        case 3: imageIndex = 3; break; // Rango 3: Arbusto (fase_3.png)
+        case 4: imageIndex = 4; break; // Rango 4: Árbol Fuerte (fase_4.png)
+        case 5: imageIndex = 4; break; // Rango 5: Árbol Frutal (USA fase_4.png)
+        default: imageIndex = 0;
+    }
+    
+    // (Si tienes una 'fase_5.png', cambia la línea 'case 5' por 'imageIndex = 5;')
 
-    // Cambia la fuente de la imagen
-    plantImage.src = `src/Assets/fase_${imageIndex+1}.png`;
-    plantImage.alt = `Planta en rango ${imageIndex+1}`;
+    // Asegúrate que tu ruta sea correcta. Basado en tu HTML, es "src/Assets/..."
+    plantImage.src = `src/Assets/fase_${imageIndex}.png`; 
+    plantImage.alt = `Planta en ${RANGOS_DATA[currentRango].nombre}`;
 }
 
 
 /**
+ * ¡FUNCIÓN CORREGIDA!
  * Actualiza todos los elementos visuales de la app.
+ * Llama a 'updatePlantImage()' SIN parámetros.
  */
 function actualizarUI() {
-    // --- CAMBIO ---
-    // Ya no actualizamos el emoji, esa lógica se movió
-    // if (plantImage) {
-    //     plantImage.textContent = (currentRango === 1) ? '🌱' : '🪴'; 
-    // }
-
     if (totalAhorradoDisplay) totalAhorradoDisplay.textContent = `Has ahorrado ${formatCurrency(totalAhorrado)}`;
     if (totalPuntosDisplay) totalPuntosDisplay.textContent = Math.floor(totalPuntos).toString();
 
+    // Muestra cuánto falta para la meta del siguiente rango
     const restante = siguienteMetaRango - totalAhorrado;
     if (metaDisplay) {
-        metaDisplay.textContent = `Meta ${formatCurrency(siguienteMetaRango)} - Faltan ${formatCurrency(restante)}`;
+        if (currentRango === 5) {
+            metaDisplay.textContent = `¡Meta de ${formatCurrency(siguienteMetaRango)} alcanzada!`;
+        } else {
+            // Lógica especial para Rango 1 -> 2
+            if (currentRango === 1) {
+                // La meta es la MÁXIMA entre la personal y la fija de Rango 2
+                const metaVisible = Math.max(RANGOS_DATA[2].meta, metaAhorro);
+                const restanteVisible = metaVisible - totalAhorrado;
+                metaDisplay.textContent = `Meta ${formatCurrency(metaVisible)} - Faltan ${formatCurrency(Math.max(0, restanteVisible))}`;
+            } else {
+                metaDisplay.textContent = `Meta ${formatCurrency(siguienteMetaRango)} - Faltan ${formatCurrency(Math.max(0, restante))}`;
+            }
+        }
     }
 
-    // --- CÁLCULO DE PROGRESO ---
+    // --- CÁLCULO DE PROGRESO (Para la barra) ---
     let progreso = 0;
     if (siguienteMetaRango > 0) {
-        progreso = Math.min((totalAhorrado / siguienteMetaRango) * 100, 100);
+        if (currentRango === 5) {
+            progreso = 100; // Rango máximo, barra llena
+        } else {
+            const metaAnterior = RANGOS_DATA[currentRango].meta;
+            
+            // Lógica especial para Rango 1 -> 2
+            let metaVisibleSiguiente = siguienteMetaRango;
+            if (currentRango === 1) {
+                 metaVisibleSiguiente = Math.max(RANGOS_DATA[2].meta, metaAhorro);
+            }
+            
+            const totalDelRango = metaVisibleSiguiente - metaAnterior;
+            const ahorroEnEsteRango = totalAhorrado - metaAnterior;
+            
+            if (totalDelRango > 0) {
+                progreso = Math.min((ahorroEnEsteRango / totalDelRango) * 100, 100);
+            }
+        }
     }
 
     if (progressBarFill) {
-        const progreso = (siguienteMetaRango > 0) ? Math.min((totalAhorrado / siguienteMetaRango) * 100, 100) : 0;
         progressBarFill.style.width = `${progreso}%`;
     }
 
-    // --- NUEVA LLAMADA ---
-    // Llama a la función que actualiza la imagen
-    updatePlantImage(progreso);
+    // --- LLAMADA CORREGIDA ---
+    // Llama a la función SIN el 'progreso'
+    updatePlantImage(); // <-- PARÉNTESIS VACÍOS
 
     renderMissions();
 }
 
-// --- LÓGICA DEL MODAL DE META (Onboarding) ---
-
-interface ModalState {
-    isAnimating: boolean;
-    activeModal: string | null;
-}
-
-const modalState: ModalState = {
-    isAnimating: false,
-    activeModal: null
-};
+// --- 7. LÓGICA DE MODALES Y EVENTOS ---
 
 function animateModal(modal: HTMLElement, opening: boolean) {
     if (modalState.isAnimating) return;
     modalState.isAnimating = true;
 
-    // Add transition classes
     modal.classList.add('modal-transition');
     modal.style.opacity = opening ? '0' : '1';
     
-    // Show modal immediately for animation
-    if (opening) {
-        modal.classList.remove('hidden');
-    }
+    if (opening) modal.classList.remove('hidden');
 
-    // Start animation in next frame
     requestAnimationFrame(() => {
         modal.style.opacity = opening ? '1' : '0';
         
-        // Wait for animation to complete
         setTimeout(() => {
-            if (!opening) {
-                modal.classList.add('hidden');
-            }
+            if (!opening) modal.classList.add('hidden');
             modal.classList.remove('modal-transition');
             modalState.isAnimating = false;
-        }, 300); // Match CSS transition duration
+        }, 300);
     });
 }
 
 function openGoalSetupModal() {
     if (!goalSetupModal || modalState.activeModal) return;
-    
     modalState.activeModal = 'goal';
     animateModal(goalSetupModal, true);
-    
-    // Focus input after animation
     setTimeout(() => {
         if (goalAmountInput) {
             goalAmountInput.focus();
@@ -417,20 +434,14 @@ function openGoalSetupModal() {
 
 function closeGoalSetupModal() {
     if (!goalSetupModal || modalState.activeModal !== 'goal') return;
-    
     animateModal(goalSetupModal, false);
     modalState.activeModal = null;
 }
 
-// --- LÓGICA DEL MODAL DE DEPÓSITO (Conectado) ---
-
 function openDepositModal() {
-    if (!openDepositModal || modalState.activeModal) return;
-    
+    if (!bottomSheetOverlay || modalState.activeModal) return;
     modalState.activeModal = 'deposit';
-    if (bottomSheetOverlay) animateModal(bottomSheetOverlay, true);
-    
-    // Focus input after animation
+    animateModal(bottomSheetOverlay, true);
     setTimeout(() => {
         if (depositAmountInput) {
             depositAmountInput.focus();
@@ -440,9 +451,8 @@ function openDepositModal() {
 }
 
 function closeDepositModal() {
-    if (!openDepositModal || modalState.activeModal !== 'deposit') return;
-    
-    if (bottomSheetOverlay) animateModal(bottomSheetOverlay, false);
+    if (!bottomSheetOverlay || modalState.activeModal !== 'deposit') return;
+    animateModal(bottomSheetOverlay, false);
     modalState.activeModal = null;
 }
 
@@ -452,13 +462,21 @@ function openSuccessModal() {
 }
 
 function closeSuccessModal() {
-    // cerrar todo y volver al estado inicial
-    if (bottomSheetOverlay) bottomSheetOverlay.classList.remove('active');
-    if (successView) successView.classList.add('hidden');
-    if (transferFormView) transferFormView.classList.remove('hidden');
+    // Cierra el modal completo
+    if (bottomSheetOverlay) animateModal(bottomSheetOverlay, false);
+    modalState.activeModal = null;
+
+    // Retrasa el reinicio de las vistas para que la animación de cierre se vea
+    setTimeout(() => {
+        if (successView) successView.classList.add('hidden');
+        if (transferFormView) transferFormView.classList.remove('hidden');
+    }, 300); // 300ms (debe coincidir con la animación)
 }
 
-// Improved form handling
+/**
+ * Confirma la meta inicial y pasa a Rango 1.
+ * Establece la meta de la UI en el valor MÁS ALTO (Meta Rango 2 o Meta Personal).
+ */
 function handleConfirmGoal() {
     if (!goalAmountInput || !goalFrequencySelect) return;
     
@@ -466,7 +484,6 @@ function handleConfirmGoal() {
     const frecuencia = goalFrequencySelect.value;
 
     if (isNaN(montoMeta) || montoMeta < 100) {
-        // (Lógica de error... se mantiene igual)
         goalAmountInput.classList.add('shake-animation');
         setTimeout(() => goalAmountInput.classList.remove('shake-animation'), 500);
         const errorMsg = document.createElement('div');
@@ -481,17 +498,12 @@ function handleConfirmGoal() {
     metaAhorro = montoMeta; // Guardamos la meta personal (Ej: $5,000)
     metaFrecuencia = frecuencia;
     
-    // --- CAMBIO CLAVE (LÓGICA RANGO 1 -> 2) ---
     currentRango = 1; // Pasa a Rango 1 (Semilla)
     
-    // Obtenemos la meta fija del Rango 2 ($1,000)
     const metaRango2 = RANGOS_DATA.find(r => r.rango === 2)!.meta; // 1000.00
     
     // Tu nueva regla: La meta visible (UI) es el MÁXIMO entre la meta Rango 2 y la meta Personal.
     siguienteMetaRango = Math.max(metaRango2, metaAhorro);
-    // (Si la meta personal es $500, siguienteMetaRango = 1000)
-    // (Si la meta personal es $5000, siguienteMetaRango = 5000)
-    // --- FIN CAMBIO ---
 
     const successFeedback = document.createElement('div');
     successFeedback.className = 'success-feedback';
@@ -501,17 +513,21 @@ function handleConfirmGoal() {
     `;
     
     if (goalSetupModal) {
-        goalSetupModal.appendChild(successFeedback);
+        // Muestra el feedback de éxito
+        const modalContent = goalSetupModal.querySelector('.modal-content');
+        if (modalContent) modalContent.appendChild(successFeedback);
+        
         setTimeout(() => {
             closeGoalSetupModal();
             checkMissionProgress('SET_GOAL'); 
             loadDailyMissions();
             checkAppState();
+            
+            // Quita el feedback después para el próximo uso
+            successFeedback.remove();
         }, 1500);
     }
 }
-
-// --- LÓGICA DEL MODAL DE DEPÓSITO (Conectado) ---
 
 function handleDeposit() {
     if (!depositAmountInput || currentRango === 0) {
@@ -522,6 +538,7 @@ function handleDeposit() {
     const montoDepositado = parseFloat(depositAmountInput.value);
     
     if (isNaN(montoDepositado) || montoDepositado <= 0) {
+        // Aquí puedes poner una animación de error en el input
         console.error("Monto inválido.");
         return;
     }
@@ -537,23 +554,17 @@ function handleDeposit() {
     checkRangoUpgrade();
 
     // 4. Limpiar y mostrar éxito
-    depositAmountInput.value = "";
-    closeDepositModal();
+    depositAmountInput.value = "100.00"; // Reinicia al valor por defecto
     openSuccessModal();
     
-    // Si no hubo subida de rango, asegura la actualización
-    if (currentRango < 2) actualizarUI(); 
+    // 5. Actualizar la UI principal (ya que 'openSuccessModal' no cierra el modal)
+    actualizarUI(); 
 }
 
-// --- EVENT LISTENERS ---
+// --- 8. EVENT LISTENERS ---
+// (Inicia la aplicación)
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- ESTE BLOQUE PARECÍA SER DE BONIFICACIONES.HTML, LO DEJO PERO COMENTADO ---
-    // const pointsDisplay = document.getElementById('points-display');
-    // if (pointsDisplay) {
-    //     const currentPoints = Math.floor(Number(localStorage.getItem('totalPuntos')) || 0);
-    //     pointsDisplay.textContent = currentPoints.toString();
-    // }
 
     // 1. Onboarding
     if (startGoalBtn) startGoalBtn.addEventListener('click', openGoalSetupModal);
@@ -564,11 +575,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Depósito (Conexión de la lógica de tu amigo)
+    // 2. Depósito
     if (openDepositModalBtn) openDepositModalBtn.addEventListener('click', openDepositModal);
     if (confirmDepositBtn) confirmDepositBtn.addEventListener('click', handleDeposit);
     if (cancelDepositBtn) cancelDepositBtn.addEventListener('click', closeDepositModal);
     if (closeSuccessBtn) closeSuccessBtn.addEventListener('click', closeSuccessModal);
+    if (bottomSheetOverlay) {
+        bottomSheetOverlay.addEventListener('click', (event) => {
+            // Cierra si se da clic en el overlay, pero no en el contenido
+            if (event.target === bottomSheetOverlay) {
+                closeDepositModal();
+            }
+        });
+    }
 
     // 3. INICIALIZACIÓN
     checkAppState();
@@ -581,29 +600,6 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-document.addEventListener('click', (event) => {
-    const target = event.target as HTMLElement;
-    
-    if (modalState.activeModal === 'goal' && target.classList.contains('modal-overlay')) {
-        closeGoalSetupModal();
-    }
-    
-    if (modalState.activeModal === 'deposit' && target.classList.contains('modal-overlay')) {
-        closeDepositModal();
-    }
-});
-
-const RANGOS_DATA: RangoData[] = [
-    // Rango 0: Inactivo
-    { rango: 0, nombre: "Tierra Sola", meta: 0, recompensaPts: 0 },
-    // Rango 1: Se activa al poner la meta (Misión 'SET_GOAL' da los 100 Pts)
-    { rango: 1, nombre: "Semilla", meta: 1, recompensaPts: 100 }, 
-    // Rango 2: Se activa al llegar a $1,000
-    { rango: 2, nombre: "Planta Joven", meta: 1000, recompensaPts: 500 },
-    // Rango 3: Se activa al llegar a $5,000
-    { rango: 3, nombre: "Arbusto", meta: 5000, recompensaPts: 1000 },
-    // Rango 4: Se activa al llegar a $20,000
-    { rango: 4, nombre: "Árbol Fuerte", meta: 20000, recompensaPts: 2500 },
-    // Rango 5: Se activa al llegar a $50,000
-    { rango: 5, nombre: "Árbol Frutal", meta: 50000, recompensaPts: 0, recompensaCashback: 100 }
-];
+// (Esta sección estaba al final de tu archivo, pero ya no es necesaria aquí)
+// (La movimos a la sección 2. CONSTANTES GLOBALES)
+// const RANGOS_DATA: RangoData[] = [ ... ];
