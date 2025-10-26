@@ -88,3 +88,666 @@
 .btn-canjear:hover {
     background-color: #dc2f3c;
 }
+
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' */
+
+/* --- Configuración General --- */
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #e5e7eb; /* Fondo gris para la página */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* --- Contenedor de la App --- */
+.app-container {
+    width: 100%;
+    max-width: 420px; /* Ancho típico de un teléfono */
+    background-color: #f9fafb; /* Fondo principal de la app (gris muy claro) */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden; 
+    position: relative; 
+    min-height: 100vh; /* Asegura que la app ocupe toda la pantalla */
+    padding-bottom: 90px; /* Deja espacio para el footer */
+}
+
+/* --- Elementos de Estado y Onboarding --- */
+
+/* Ocultar elementos */
+.hidden {
+    display: none !important;
+}
+
+/* Estilo del overlay para modales */
+.modal-overlay {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    transition: opacity 0.2s ease;
+}
+
+/* Contenido genérico de modal centrado */
+.modal-content {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 380px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* --- 1. Cabecera Roja --- */
+.app-header {
+    background-color: #e63946; /* Rojo principal */
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.back-arrow {
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* --- 2. Contenido Principal --- */
+.content-area {
+    padding: 1.5rem;
+}
+
+/* --- ONBOARDING SECTION (Nueva) --- */
+.onboarding-container {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.onboarding-container .plant-icon {
+    font-size: 8rem; /* El emoji de la planta o semilla */
+    margin-bottom: 1.5rem;
+}
+
+.onboarding-container h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.onboarding-container p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+/* El botón usa la clase .btn-primary */
+
+
+/* --- 2.1. Tarjeta de Ahorro --- */
+.savings-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: grid;
+    grid-template-columns: 3fr 1fr; 
+    align-items: start;
+    row-gap: 0.5rem;
+    border: 1px solid #d1d5db;
+}
+
+.savings-info h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #4B465C;
+}
+
+.savings-info .meta {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.savings-yield {
+    text-align: right;
+}
+
+.badge-rendimiento {
+    background-color: #dcfce7; 
+    color: #166534; 
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    display: inline-block;
+}
+
+.savings-yield .anual {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.progress-bar {
+    grid-column: 1 / -1; 
+    width: 100%;
+    background-color: #e5e7eb; 
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #e63946; 
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* --- 2.2. Sección de la Planta --- */
+.plant-section {
+    text-align: center;
+    padding: 2.5rem 0;
+}
+
+.plant-image {
+    font-size: 7rem;
+    line-height: 1;
+}
+
+/* --- 2.3. Grid de Estadísticas --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.stat-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 1rem 0.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    border: 1px solid #d1d5db;
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.stat-card p {
+    margin: 0.25rem 0;
+    color: #374151;
+    font-weight: 500;
+}
+
+.stat-card .stat-value {
+    color: #6b7280;
+    font-weight: normal;
+}
+
+.stat-card .stat-value.red {
+    color: #e63946;
+    font-weight: 600;
+}
+
+/* --- 2.4. Sección de Misiones --- */
+.missions-section {
+    margin-top: 1.69rem;
+}
+
+.missions-section h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    color: #4B465C;
+}
+
+.mission-list {
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #d1d5db;
+}
+
+.mission-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #DBDADE;
+}
+
+.mission-card:last-child {
+    border-bottom: none;
+}
+
+.mission-icon-bg {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 1rem;
+    flex-shrink: 0; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* --- Colores de los iconos de misión (Nuevos) --- */
+.bg-yellow-200 { background-color: #fef9c3; color: #a16207; } /* SET_GOAL */
+.bg-green-200 { background-color: #d1fae5; color: #065f46; } /* DEPOSIT */
+.bg-pink-200 { background-color: #fce7f3; color: #9d174d; } /* DEPOSIT (Alto) */
+.bg-blue-200 { background-color: #dbeafe; color: #1e40af; } /* READ_TIP */
+
+
+.mission-details {
+    flex-grow: 1; 
+}
+
+.mission-details .mission-title {
+    margin: 0;
+    font-weight: 600;
+    color: #4B465C;
+}
+
+.mission-details .mission-rewards {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.mission-arrow {
+    font-size: 1.5rem;
+    color: #e63946;
+    font-weight: bold;
+}
+
+/* --- 3. Footer Fijo --- */
+.app-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.footer-buttons {
+    display: flex;
+    gap: 1rem;
+    padding: 0 0.5rem;
+}
+
+/* Button Base Styles */
+.btn-depositar,
+.btn-bonificaciones {
+    flex: 1;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+/* Primary Button (Depositar) */
+.btn-depositar {
+    background-color: #e63946;
+    color: white;
+}
+
+.btn-depositar:hover {
+    background-color: #dc2f3c;
+    transform: translateY(-1px);
+}
+
+.btn-depositar:active {
+    transform: translateY(0);
+}
+
+/* Secondary Button (Bonificaciones) */
+.btn-bonificaciones {
+    background-color: #f9fafb;
+    color: #e63946;
+    border: 2px solid #e63946;
+}
+
+.btn-bonificaciones:hover {
+    background-color: #fee2e2;
+    transform: translateY(-1px);
+}
+
+.btn-bonificaciones:active {
+    transform: translateY(0);
+}
+
+/* Button Icons */
+.btn-icon {
+    font-size: 1.2rem;
+}
+
+/* Button Text */
+.btn-text {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 360px) {
+    .footer-buttons {
+        gap: 0.5rem;
+        padding: 0;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .btn-depositar,
+    .btn-bonificaciones {
+        padding: 0.75rem;
+    }
+
+    .btn-icon {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+}
+
+/* --- MODAL DE DEPÓSITO (Bottom Sheet) --- */
+
+/* Adaptando las clases existentes de tu amigo */
+.modal-overlay {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Alinear a la parte inferior para Bottom Sheet */
+    z-index: 20;
+}
+
+.modal-content.goal-setup-content {
+    align-self: center; /* Centrar el modal de meta */
+    width: 90%;
+}
+
+.modal-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    text-align: center;
+}
+
+.input-label {
+    align-self: flex-start;
+    font-size: 0.9rem;
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: -0.5rem;
+}
+
+/* Estilos de botones generales para el modal */
+.modal-view .btn-primary,
+.modal-view .btn-secondary {
+    width: 100%;
+    border: none;
+    padding: 1rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.modal-view .btn-primary {
+    background-color: #e63946;
+    color: white;
+}
+
+.modal-view .btn-secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+/* Modal Animations */
+.modal-transition {
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Error Feedback */
+.shake-animation {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.error-message {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    animation: slideIn 0.3s ease;
+}
+
+/* Success Feedback */
+.success-feedback {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+.success-icon {
+    width: 64px;
+    height: 64px;
+    background-color: #10b981;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin-bottom: 1rem;
+    animation: scaleIn 0.3s ease;
+}
+
+.success-feedback p {
+    color: #374151;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+}
+
+@keyframes scaleIn {
+    from { 
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Animations */
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Estilos específicos para los botones principales del onboarding */
+#start-goal-btn,
+#confirm-goal-btn {
+    background-color: #e63946;
+    color: white;
+    width: 100%;
+    max-width: 300px;
+    padding: 1rem;
+    border: none;
+    border-radius: 9999px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 auto;
+    display: block;
+}
+
+#start-goal-btn:hover,
+#confirm-goal-btn:hover {
+    background-color: #dc2f3c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(230, 57, 70, 0.1);
+}
+
+#start-goal-btn:active,
+#confirm-goal-btn:active {
+    transform: translateY(0);
+}
+
+/* Asegurarse que el botón de confirmar meta mantenga el estilo dentro del modal */
+.goal-setup-content #confirm-goal-btn {
+    margin-top: 1rem;
+}
+
+/* --- Bonificaciones Page Styles --- */
+.app-container {
+    padding-bottom: 2rem;
+    background-color: #f9fafb;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-header .back-arrow {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Botón de Semillas */
+.semillas-display {
+    background-color: white;
+    color: #4B465C;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Filtro de Categorías */
+.category-filter {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0 1.5rem 1rem 1.5rem;
+    margin: 0 -1.5rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.category-filter::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-scroll-container {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.filter-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 1.25rem;
+    border: 1px solid #DBDADE;
+    background-color: #ffffff;
+    color: #4B465C;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-tab.active {
+    background-color: #e63946;
+    color: white;
+    border-color: #e63946;
+}
+
+.plant-section {
+    text-align: center;
+    margin: 2rem 0;
+    min-height: 150px; /* Asegura un espacio mínimo si la imagen tarda en cargar */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Nuevos estilos para la imagen de la planta */
+.plant-image-display {
+    max-width: 500px; /* Ajusta el tamaño de la imagen */
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
