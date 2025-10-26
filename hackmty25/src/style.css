@@ -293,57 +293,106 @@ body {
 
 /* --- 3. Footer Fijo --- */
 .app-footer {
-    position: fixed; /* Cambiado a fixed para funcionar mejor con el modal */
+    position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background-color: #ffffff;
-    padding: 1.25rem 1.5rem;
+    padding: 1rem;
     border-top: 1px solid #e5e7eb;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
     z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem; 
-    max-width: 420px; /* Asegura que el footer no se salga del contenedor */
+    max-width: 420px;
     margin: 0 auto;
 }
 
-/* Estilo del botón principal (Depositar) y Bonificaciones */
-.btn-primary, .btn-secondary, .btn-depositar {
-    width: 100%;
-    border: none;
+.footer-buttons {
+    display: flex;
+    gap: 1rem;
+    padding: 0 0.5rem;
+}
+
+/* Button Base Styles */
+.btn-depositar,
+.btn-bonificaciones {
+    flex: 1;
     padding: 1rem;
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 600;
-    border-radius: 8px;
+    border-radius: 9999px;
+    border: none;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
 }
 
-.btn-primary {
-    background-color: #e63946; /* Rojo principal */
-    color: white;
-}
-
-/* Estilos de Botones Específicos del Footer (usados en .btn-depositar, etc.) */
-.app-footer .btn-depositar {
-    width: 100%; 
+/* Primary Button (Depositar) */
+.btn-depositar {
     background-color: #e63946;
     color: white;
-    border: 2px solid #e63946;
-    padding: 1rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-radius: 9999px;
-}
-/* Estilo del botón de Onboarding */
-.onboarding-container .btn-primary {
-    padding: 1rem;
-    border-radius: 9999px;
 }
 
+.btn-depositar:hover {
+    background-color: #dc2f3c;
+    transform: translateY(-1px);
+}
+
+.btn-depositar:active {
+    transform: translateY(0);
+}
+
+/* Secondary Button (Bonificaciones) */
+.btn-bonificaciones {
+    background-color: #f9fafb;
+    color: #e63946;
+    border: 2px solid #e63946;
+}
+
+.btn-bonificaciones:hover {
+    background-color: #fee2e2;
+    transform: translateY(-1px);
+}
+
+.btn-bonificaciones:active {
+    transform: translateY(0);
+}
+
+/* Button Icons */
+.btn-icon {
+    font-size: 1.2rem;
+}
+
+/* Button Text */
+.btn-text {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 360px) {
+    .footer-buttons {
+        gap: 0.5rem;
+        padding: 0;
+    }
+
+    .btn-text {
+        display: none;
+    }
+
+    .btn-depositar,
+    .btn-bonificaciones {
+        padding: 0.75rem;
+    }
+
+    .btn-icon {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+}
 
 /* --- MODAL DE DEPÓSITO (Bottom Sheet) --- */
 
@@ -424,24 +473,50 @@ body {
 /* Success Feedback */
 .success-feedback {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
     animation: fadeIn 0.3s ease;
 }
 
 .success-icon {
+    width: 64px;
+    height: 64px;
     background-color: #10b981;
     color: white;
-    width: 48px;
-    height: 48px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    margin: 0 auto 1rem;
+    font-size: 32px;
+    margin-bottom: 1rem;
+    animation: scaleIn 0.3s ease;
+}
+
+.success-feedback p {
+    color: #374151;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+}
+
+@keyframes scaleIn {
+    from { 
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    to { 
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* Animations */
@@ -460,4 +535,39 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+/* Estilos específicos para los botones principales del onboarding */
+#start-goal-btn,
+#confirm-goal-btn {
+    background-color: #e63946;
+    color: white;
+    width: 100%;
+    max-width: 300px;
+    padding: 1rem;
+    border: none;
+    border-radius: 9999px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 auto;
+    display: block;
+}
+
+#start-goal-btn:hover,
+#confirm-goal-btn:hover {
+    background-color: #dc2f3c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(230, 57, 70, 0.1);
+}
+
+#start-goal-btn:active,
+#confirm-goal-btn:active {
+    transform: translateY(0);
+}
+
+/* Asegurarse que el botón de confirmar meta mantenga el estilo dentro del modal */
+.goal-setup-content #confirm-goal-btn {
+    margin-top: 1rem;
 }
