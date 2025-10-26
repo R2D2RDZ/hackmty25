@@ -1,2 +1,2 @@
-import "style.css"
-import "bonificaciones.css"
+import "./style.css"
+import "./bonificaciones.css"
