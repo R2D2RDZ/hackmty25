@@ -1,0 +1,53 @@
+# Nombre del workflow
+name: Deploy to GitHub Pages
+
+# Se ejecuta cada vez que haces 'push' a la rama 'main'
+on:
+  push:
+    branches: [ main ] # Cambia 'main' si tu rama principal es 'master'
+
+# Permisos que necesita la Acción para funcionar
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Tareas (jobs) que se van a ejecutar
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # Usará un servidor de Linux
+    steps:
+      # 1. Descarga tu código del repositorio
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Configura el entorno de Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # Puedes cambiar la versión de Node si la necesitas
+
+      # 3. Instala las dependencias (como React, Vue, etc.)
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Construye tu proyecto (convierte tu código a HTML, CSS, JS estáticos)
+      - name: Build
+        run: npm run build # Este es el script de tu 'package.json'
+
+      # 5. Prepara la carpeta de 'build' para subirla
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      # 6. Sube los archivos construidos
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Esta debe ser la carpeta que genera 'npm run build'
+          # ¡Cambia 'dist' si tu proyecto usa 'build' o 'public'!
+          path: './dist' 
+
+      # 7. Despliega los archivos en GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
