@@ -332,7 +332,7 @@ function updatePlantImage() { // <-- PARÉNTESIS VACÍOS
     // (Si tienes una 'fase_5.png', cambia la línea 'case 5' por 'imageIndex = 5;')
 
     // Asegúrate que tu ruta sea correcta. Basado en tu HTML, es "src/Assets/..."
-    plantImage.src = `src/Assets/fase_${imageIndex}.png`; 
+    plantImage.src = `/Assets/fase_${imageIndex}.png`; 
     plantImage.alt = `Planta en ${RANGOS_DATA[currentRango].nombre}`;
 }
 
