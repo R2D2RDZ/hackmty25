@@ -26,7 +26,10 @@ const totalAhorradoDisplay = document.getElementById('total-ahorrado-display') a
 const metaDisplay = document.getElementById('meta-display') as HTMLParagraphElement | null;
 const progressBarFill = document.getElementById('progress-bar-fill') as HTMLDivElement | null;
 const totalPuntosDisplay = document.getElementById('total-puntos-display') as HTMLParagraphElement | null;
-const plantImage = document.getElementById('plant-image') as HTMLDivElement | null; // Placeholder de la imagen
+
+// --- CAMBIO IMPORTANTE ---
+// Ahora seleccionamos el <img> que pusiste en index.html
+const plantImage = document.getElementById('plant-image') as HTMLImageElement | null; 
 const openDepositModalBtn = document.querySelector('.btn-depositar') as HTMLButtonElement | null;
 
 // Modal de Depósito (adaptado al bottom-sheet de index.html)
@@ -242,14 +245,45 @@ function checkAppState() {
     }
 }
 
+// --- NUEVA FUNCIÓN ---
+/**
+ * Actualiza la imagen de la planta basándose en el progreso.
+ * El progreso es un valor de 0 a 100.
+ * Asignamos 6 rangos (0-5) para las imágenes.
+ */
+function updatePlantImage(progress: number) {
+    if (!plantImage) return;
+
+    let imageIndex = 0; // Rango 0 por defecto (plant-0.png)
+
+    if (progress >= 100) {
+        imageIndex = 5; // Rango 5: Meta alcanzada (plant-5.png)
+    } else if (progress >= 80) {
+        imageIndex = 4; // Rango 4 (plant-4.png)
+    } else if (progress >= 60) {
+        imageIndex = 3; // Rango 3 (plant-3.png)
+    } else if (progress >= 40) {
+        imageIndex = 2; // Rango 2 (plant-2.png)
+    } else if (progress >= 20) {
+        imageIndex = 1; // Rango 1 (plant-1.png)
+    } 
+    // Si es < 20, se queda en imageIndex = 0
+
+    // Cambia la fuente de la imagen
+    plantImage.src = `assets/rango/plant-${imageIndex}.png`;
+    plantImage.alt = `Planta en rango ${imageIndex}`;
+}
+
+
 /**
  * Actualiza todos los elementos visuales de la app.
  */
 function actualizarUI() {
-    // Si la imagen existe, actualiza el emoji según el rango
-    if (plantImage) {
-        plantImage.textContent = (currentRango === 1) ? '🌱' : '🪴'; 
-    }
+    // --- CAMBIO ---
+    // Ya no actualizamos el emoji, esa lógica se movió
+    // if (plantImage) {
+    //     plantImage.textContent = (currentRango === 1) ? '🌱' : '🪴'; 
+    // }
 
     if (totalAhorradoDisplay) totalAhorradoDisplay.textContent = `Has ahorrado ${formatCurrency(totalAhorrado)}`;
     if (totalPuntosDisplay) totalPuntosDisplay.textContent = Math.floor(totalPuntos).toString();
@@ -259,10 +293,20 @@ function actualizarUI() {
         metaDisplay.textContent = `Meta ${formatCurrency(siguienteMetaRango)} - Faltan ${formatCurrency(restante)}`;
     }
 
+    // --- CÁLCULO DE PROGRESO ---
+    let progreso = 0;
+    if (siguienteMetaRango > 0) {
+        progreso = Math.min((totalAhorrado / siguienteMetaRango) * 100, 100);
+    }
+
     if (progressBarFill) {
         const progreso = (siguienteMetaRango > 0) ? Math.min((totalAhorrado / siguienteMetaRango) * 100, 100) : 0;
         progressBarFill.style.width = `${progreso}%`;
     }
+
+    // --- NUEVA LLAMADA ---
+    // Llama a la función que actualiza la imagen
+    updatePlantImage(progreso);
 
     renderMissions();
 }
@@ -453,15 +497,12 @@ function handleDeposit() {
 // --- EVENT LISTENERS ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    const pointsDisplay = document.getElementById('points-display');
-    
-    // Get points from localStorage (set by main app)
-    const currentPoints = Math.floor(Number(localStorage.getItem('totalPuntos')) || 0);
-    
-    // Update display
-    if (pointsDisplay) {
-        pointsDisplay.textContent = currentPoints.toString();
-    }
+    // --- ESTE BLOQUE PARECÍA SER DE BONIFICACIONES.HTML, LO DEJO PERO COMENTADO ---
+    // const pointsDisplay = document.getElementById('points-display');
+    // if (pointsDisplay) {
+    //     const currentPoints = Math.floor(Number(localStorage.getItem('totalPuntos')) || 0);
+    //     pointsDisplay.textContent = currentPoints.toString();
+    // }
 
     // 1. Onboarding
     if (startGoalBtn) startGoalBtn.addEventListener('click', openGoalSetupModal);
