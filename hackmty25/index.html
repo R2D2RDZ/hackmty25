@@ -18,15 +18,15 @@
 
             <section class="savings-card">
                 <div class="savings-info">
-                    <h2>Has ahorrado $1,000</h2>
-                    <p class="meta">Meta $5000 - Faltan $4,000</p>
+                    <h2 id="total-ahorrado-display">Has ahorrado $1,000</h2>
+                    <p id="meta-display"class="meta">Meta $5,000 - Faltan $4,000</p>
                 </div>
                 <div class="savings-yield">
                     <span class="badge-rendimiento">Rendimiento</span>
                     <p class="anual">7.5% Anual</p>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: 20%;"></div>
+                    <div id="progress-bar-fill" class="progress-fill" style="width: 20%;"></div>
                 </div>
             </section>
 
@@ -59,24 +59,87 @@
 
             <section class="missions-section">
                 <h3>Misiones de hoy</h3>
-                <!-- La lista de misiones se generará dinámicamente aquí -->
-                <div class="mission-list" id="mission-list-container">
+                <div class="mission-list">
                     
+                    <div class="mission-card">
+                        <div class="mission-icon-bg bg-green"></div>
+                        <div class="mission-details">
+                            <p class="mission-title">Deposita 10 pesos</p>
+                            <p class="mission-rewards">
+                                <span>🪙 1</span>
+                                <span>💧 3</span>
+                                <span>🌼 2</span>
+                            </p>
+                        </div>
+                        <span class="mission-arrow">&gt;</span>
+                    </div>
+
+                    <div class="mission-card">
+                        <div class="mission-icon-bg bg-pink"></div>
+                        <div class="mission-details">
+                            <p class="mission-title">Lee este tip financiero</p>
+                            <p class="mission-rewards">
+                                <span>🪙 2</span>
+                                <span>💧 2</span>
+                                <span>🌼 2</span>
+                            </p>
+                        </div>
+                        <span class="mission-arrow">&gt;</span>
+                    </div>
+
+                    <div class="mission-card mission-card3">
+                        <div class="mission-icon-bg bg-orange"></div>
+                        <div class="mission-details">
+                            <p class="mission-title">Lee tu consejo del día</p>
+                            <p class="mission-rewards">
+                                <span>🪙 2</span>
+                                <span>💧 2</span>
+                                <span>🌼 2</span>
+                            </p>
+                        </div>
+                        <span class="mission-arrow">&gt;</span>
+                    </div>
+
                 </div>
             </section>
 
         </main>
 
         <footer class="app-footer">
+            <button class="btn-bonificaciones">Bonificaciones</button>
             <button class="btn-depositar">Depositar</button>
         </footer>
 
-        <div id="deposit-modal" class="modal-overlay hidden"> <div class="modal-content">
-                <h3>¿Cuánto quieres depositar?</h3>
-                <input type="number" id="deposit-amount-input" placeholder="0.00" min="0">
-                
-                <button id="confirm-deposit-btn" class="btn-primary">Confirmar</button>
-                <button id="close-modal-btn" class="btn-secondary">Cancelar</button>
+        <div id="bottom-sheet-modal" class="bottom-sheet-overlay hidden">
+            <div class="bottom-sheet-content">
+
+                <div id="transfer-form-view" class="modal-view">
+                    <h3>Transferir</h3>
+                    
+                    <label for="origin-account-select" class="input-label">Cuenta origen</label>
+                    <div class="custom-select-wrapper">
+                        <img src="https://via.placeholder.com/24" alt="Card Icon" class="card-icon"> <select id="origin-account-select" class="custom-select">
+                            <option value="1234-5678-9101" selected>1234-5678-9101</option>
+                            <option value="xxxx-xxxx-xxxx-xxxx">Otra Cuenta</option>
+                        </select>
+                        <span class="select-arrow"></span>
+                    </div>
+
+                    <label for="deposit-amount-input" class="input-label">¿Cuánto quieres depositar?</label>
+                    <input type="number" id="deposit-amount-input" placeholder="$ 100.00" min="0" value="100.00">
+                    
+                    <button id="confirm-deposit-btn" class="btn-primary">Depositar</button>
+                    <button id="cancel-deposit-btn" class="btn-secondary">Cancelar</button>
+                </div>
+
+                <div id="success-view" class="modal-view hidden">
+                    <div class="success-icon">
+                        <span class="checkmark">✔</span>
+                    </div>
+                    <h3>Transferencia realizada con éxito</h3>
+                    <button id="close-success-btn" class="btn-primary">Cerrar</button>
+                </div>
+
             </div>
         </div>
 

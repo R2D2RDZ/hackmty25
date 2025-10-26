@@ -235,15 +235,23 @@ body {
     padding: 1.25rem 1.5rem;
     border-top: 1px solid #e5e7eb;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
-    /* Aseguramos que esté sobre el contenido si hay scroll */
     z-index: 10;
+    
+    /* --- CAMBIOS --- */
+    /* Usamos flex para alinear los botones */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem; /* Espacio entre los dos botones */
 }
 
+/* Estilo del botón principal (Depositar) */
 .btn-depositar {
-    width: 100%;
+    width: 50%;     /* Cada botón ocupa la mitad */
+    flex-grow: 1;   /* Crece para llenar el espacio */
     background-color: #e63946;
     color: white;
-    border: none;
+    border: 2px solid #e63946; /* Añadimos borde para consistencia */
     padding: 1rem;
     font-size: 1.1rem;
     font-weight: 600;
@@ -251,86 +259,203 @@ body {
     cursor: pointer;
 }
 
-/* --- 4. Modal de Depósito --- */
+/* --- NUEVO ESTILO --- */
+/* Estilo del botón secundario (Bonificaciones) */
+.btn-bonificaciones {
+    width: 50%;
+    flex-grow: 1;
+    background-color: #f9fafb; /* Fondo gris/blanco */
+    color: #e63946; /* Texto rojo */
+    border: 2px solid #e63946; /* Borde rojo */
+    /* El padding se ajusta por el borde para que se vean del mismo alto */
+    padding: calc(1rem - 2px); 
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    cursor: pointer;
+}
+
+/* --- 4. Bottom Sheet Modal (Deslizable desde abajo) --- */
 
 /* Clase 'helper' para ocultar/mostrar */
 .hidden {
-    display: none !important; /* !important para asegurar que se oculte */
+    display: none !important;
 }
 
-/* El fondo oscuro semi-transparente */
-.modal-overlay {
-    position: absolute; /* Se posiciona sobre la app */
+/* Overlay (fondo oscuro) */
+.bottom-sheet-overlay {
+    position: fixed; /* Ahora es 'fixed' para cubrir toda la ventana, no solo la app */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Fondo negro con 60% opacidad */
-    
-    /* Centrado con Flexbox */
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     justify-content: center;
-    align-items: center;
-    z-index: 20; /* Asegura que esté por encima de todo */
+    align-items: flex-end; /* Alinea el contenido a la parte inferior */
+    z-index: 20;
+    opacity: 0; /* Inicialmente transparente */
+    visibility: hidden; /* Inicialmente invisible */
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* El contenido blanco del modal */
-.modal-content {
+/* Clase para mostrar el overlay */
+.bottom-sheet-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Contenido del modal que se desliza */
+.bottom-sheet-content {
     background-color: #ffffff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    width: 90%; /* Ocupa el 90% del ancho de la app */
-    max-width: 350px;
+    width: 100%;
+    max-width: 400px; /* Ancho máximo igual al contenedor de la app */
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 2rem 1.5rem; /* Ajustar padding para que coincida con la imagen */
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(100%); /* Inicialmente fuera de la pantalla, abajo */
+    transition: transform 0.3s ease;
+}
+
+/* Clase para que el contenido se deslice hacia arriba */
+.bottom-sheet-overlay.active .bottom-sheet-content {
+    transform: translateY(0);
+}
+
+/* Estilos comunes para las vistas dentro del modal */
+.modal-view {
     display: flex;
     flex-direction: column;
-    gap: 1rem; /* Espacio entre los elementos (título, input, botones) */
+    gap: 1.25rem; /* Espacio entre elementos */
+    text-align: center; /* Centrar texto por defecto */
 }
 
-.modal-content h3 {
+.modal-view h3 {
     margin: 0;
-    text-align: center;
+    font-size: 1.3rem; /* Tamaño de fuente del título */
     color: #111827;
 }
 
-.modal-content input[type="number"] {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db; /* Borde gris claro */
-    border-radius: 8px;
-    font-size: 1.2rem;
-    text-align: center;
-    /* Evita que aparezcan las flechas en el input (opcional) */
-    -webkit-appearance: textfield;
-    -moz-appearance: textfield;
-    appearance: textfield;
+.input-label {
+    align-self: flex-start; /* Alinea la etiqueta a la izquierda */
+    font-size: 0.9rem;
+    color: #374151;
+    font-weight: 500;
+    margin-bottom: -0.5rem; /* Ajustar espacio para que quede más pegado al input */
 }
 
-.modal-content input[type="number"]::-webkit-outer-spin-button,
-.modal-content input[type="number"]::-webkit-inner-spin-button {
+/* Custom Select (Dropdown) */
+.custom-select-wrapper {
+    position: relative;
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem; /* Padding similar al input */
+}
+
+.custom-select-wrapper .card-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 0.75rem;
+}
+
+.custom-select {
+    flex-grow: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 1rem;
+    color: #111827;
+    /* Quitar la flecha por defecto del select en navegadores */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 1.5rem; /* Espacio para nuestra flecha custom */
+}
+
+.select-arrow {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg); /* Gira para hacer una flecha de dropdown */
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid #6b7280;
+    border-bottom: 2px solid #6b7280;
+    pointer-events: none; /* Asegura que se pueda hacer clic en el select */
+}
+
+
+.modal-view input[type="number"] {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    color: #111827;
+    text-align: left; /* Alineación del texto a la izquierda como en la imagen */
+    /* Evita que aparezcan las flechas en el input */
+    -moz-appearance: textfield;
+}
+
+.modal-view input[type="number"]::-webkit-outer-spin-button,
+.modal-view input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-/* Estilos para los botones del modal */
-.btn-primary {
-    background-color: #e63946; /* Rojo */
-    color: white;
+/* Estilos de botones generales para el modal */
+.modal-view .btn-primary,
+.modal-view .btn-secondary {
+    width: 100%;
     border: none;
-    padding: 0.8rem;
-    font-size: 1rem;
+    padding: 1rem;
+    font-size: 1.05rem;
     font-weight: 600;
-    border-radius: 8px;
+    border-radius: 8px; /* Ligeramente más cuadrado que el footer */
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-.btn-secondary {
+.modal-view .btn-primary {
+    background-color: #e63946; /* Rojo */
+    color: white;
+}
+.modal-view .btn-primary:hover {
+    background-color: #d62d3c;
+}
+
+.modal-view .btn-secondary {
     background-color: #f3f4f6; /* Gris claro */
     color: #374151; /* Gris oscuro */
     border: 1px solid #d1d5db;
-    padding: 0.8rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
+}
+.modal-view .btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
+/* --- Estilos para la Vista de Éxito --- */
+.success-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #10b981; /* Verde esmeralda */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 1rem; /* Centrar y margen inferior */
+}
+
+.success-icon .checkmark {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.modal-view#success-view h3 {
+    margin-bottom: 2rem;
 }
