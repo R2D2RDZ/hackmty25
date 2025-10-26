@@ -1,0 +1,12 @@
+# netlify.toml
+
+# Configuración para forzar el MIME Type correcto para archivos .ts
+[[headers]]
+  for = "/*.ts"
+  [headers.values]
+    Content-Type = "application/javascript"
+
+# Si todavía necesitas el fix de la URL base
+[build]
+  publish = "dist"
+  command = "vite build"
